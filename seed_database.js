@@ -8,49 +8,49 @@ const dbName = 'momi_db';
 const familyData = [
     // ===== FAMILY 1 - Smith Family (3 generations) =====
     // Generation 1 - Grandparents (oldest first, z=-8, two generations back)
-    { id: 'gf1', name: 'John Sr.', sex: 'M', birthYear: 1940, birthMonth: 3, deathYear: 2015, x: -4, z: -8 },
-    { id: 'gm1', name: 'Mary', sex: 'F', birthYear: 1942, birthMonth: 7, deathYear: 2018, x: -2, z: -8 },
-    { id: 'gf2', name: 'Robert', sex: 'M', birthYear: 1938, birthMonth: 1, deathYear: 2010, x: 2, z: -8 },
-    { id: 'gm2', name: 'Patricia', sex: 'F', birthYear: 1941, birthMonth: 11, deathYear: null, x: 4, z: -8 },
+    { id: 'gf1', name: 'John Sr.', sex: 'male', birthYear: 1940, birthMonth: 3, deathYear: 2015, x: -4, z: -8, familyId: 'smith', isDeceased: true },
+    { id: 'gm1', name: 'Mary', sex: 'female', birthYear: 1942, birthMonth: 7, deathYear: 2018, x: -2, z: -8, familyId: 'smith', isDeceased: true },
+    { id: 'gf2', name: 'Robert', sex: 'male', birthYear: 1938, birthMonth: 1, deathYear: 2010, x: 2, z: -8, familyId: 'smith', isDeceased: true },
+    { id: 'gm2', name: 'Patricia', sex: 'female', birthYear: 1941, birthMonth: 11, deathYear: null, x: 4, z: -8, familyId: 'smith', isDeceased: false },
     
     // Generation 2 - Parents (z=-4, one generation back)
-    { id: 'f1', name: 'John Jr.', sex: 'M', birthYear: 1965, birthMonth: 5, deathYear: null, x: -3, z: -4, motherId: 'gm1' },
-    { id: 'm1', name: 'Susan', sex: 'F', birthYear: 1968, birthMonth: 9, deathYear: null, x: 3, z: -4, motherId: 'gm2' },
+    { id: 'f1', name: 'John Jr.', sex: 'male', birthYear: 1965, birthMonth: 5, deathYear: null, x: -3, z: -4, motherId: 'gm1', fatherId: 'gf1', familyId: 'smith', isDeceased: false },
+    { id: 'm1', name: 'Susan', sex: 'female', birthYear: 1968, birthMonth: 9, deathYear: null, x: 3, z: -4, motherId: 'gm2', fatherId: 'gf2', familyId: 'smith', isDeceased: false },
     
     // Generation 3 - Children (youngest, z=0, closest to viewer)
-    { id: 'c1', name: 'Michael', sex: 'M', birthYear: 1995, birthMonth: 3, deathYear: null, x: -2, z: 0, motherId: 'm1' },
-    { id: 'c2', name: 'Emily', sex: 'F', birthYear: 1997, birthMonth: 2, deathYear: null, x: 0, z: 0, motherId: 'm1' },
-    { id: 'c3', name: 'Sarah', sex: 'F', birthYear: 1999, birthMonth: 6, deathYear: null, x: 2, z: 0, motherId: 'm1' },
+    { id: 'c1', name: 'Michael', sex: 'male', birthYear: 1995, birthMonth: 3, deathYear: null, x: -2, z: 0, motherId: 'm1', fatherId: 'f1', familyId: 'smith', isDeceased: false },
+    { id: 'c2', name: 'Emily', sex: 'female', birthYear: 1997, birthMonth: 2, deathYear: null, x: 0, z: 0, motherId: 'm1', fatherId: 'f1', familyId: 'smith', isDeceased: false },
+    { id: 'c3', name: 'Sarah', sex: 'female', birthYear: 1999, birthMonth: 6, deathYear: null, x: 2, z: 0, motherId: 'm1', fatherId: 'f1', familyId: 'smith', isDeceased: false },
 
     // ===== FAMILY 2 - Chen Family (3 generations) =====
     // Generation 1 - Grandparents (z=-8, two generations back)
-    { id: 'gf3', name: 'Wei', sex: 'M', birthYear: 1945, birthMonth: 8, deathYear: 2020, x: 8, z: -8 },
-    { id: 'gm3', name: 'Ling', sex: 'F', birthYear: 1947, birthMonth: 4, deathYear: null, x: 10, z: -8 },
-    { id: 'gf4', name: 'Tao', sex: 'M', birthYear: 1943, birthMonth: 12, deathYear: 2019, x: 14, z: -8 },
-    { id: 'gm4', name: 'Mei', sex: 'F', birthYear: 1946, birthMonth: 6, deathYear: null, x: 16, z: -8 },
+    { id: 'gf3', name: 'Wei', sex: 'male', birthYear: 1945, birthMonth: 8, deathYear: 2020, x: 8, z: -8, familyId: 'chen', isDeceased: true },
+    { id: 'gm3', name: 'Ling', sex: 'female', birthYear: 1947, birthMonth: 4, deathYear: null, x: 10, z: -8, familyId: 'chen', isDeceased: false },
+    { id: 'gf4', name: 'Tao', sex: 'male', birthYear: 1943, birthMonth: 12, deathYear: 2019, x: 14, z: -8, familyId: 'chen', isDeceased: true },
+    { id: 'gm4', name: 'Mei', sex: 'female', birthYear: 1946, birthMonth: 6, deathYear: null, x: 16, z: -8, familyId: 'chen', isDeceased: false },
     
     // Generation 2 - Parents (z=-4, one generation back)
-    { id: 'f2', name: 'David', sex: 'M', birthYear: 1970, birthMonth: 3, deathYear: null, x: 9, z: -4, motherId: 'gm3' },
-    { id: 'm2', name: 'Li', sex: 'F', birthYear: 1972, birthMonth: 10, deathYear: null, x: 15, z: -4, motherId: 'gm4' },
+    { id: 'f2', name: 'David', sex: 'male', birthYear: 1970, birthMonth: 3, deathYear: null, x: 9, z: -4, motherId: 'gm3', fatherId: 'gf3', familyId: 'chen', isDeceased: false },
+    { id: 'm2', name: 'Li', sex: 'female', birthYear: 1972, birthMonth: 10, deathYear: null, x: 15, z: -4, motherId: 'gm4', fatherId: 'gf4', familyId: 'chen', isDeceased: false },
     
     // Generation 3 - Children (youngest, z=0, aligned with Smith's youngest)
-    { id: 'c4', name: 'Alex', sex: 'M', birthYear: 2000, birthMonth: 5, deathYear: null, x: 10, z: 0, motherId: 'm2' },
-    { id: 'c5', name: 'Maya', sex: 'F', birthYear: 2003, birthMonth: 1, deathYear: null, x: 12, z: 0, motherId: 'm2' },
+    { id: 'c4', name: 'Alex', sex: 'male', birthYear: 2000, birthMonth: 5, deathYear: null, x: 10, z: 0, motherId: 'm2', fatherId: 'f2', familyId: 'chen', isDeceased: false },
+    { id: 'c5', name: 'Maya', sex: 'female', birthYear: 2003, birthMonth: 1, deathYear: null, x: 12, z: 0, motherId: 'm2', fatherId: 'f2', familyId: 'chen', isDeceased: false },
 ];
 
 const conceptions = [
     // ===== FAMILY 1 - Smith Family =====
-    { father: 'gf1', mother: 'gm1', child: 'f1' },
-    { father: 'gf2', mother: 'gm2', child: 'm1' },
-    { father: 'f1', mother: 'm1', child: 'c1' },
-    { father: 'f1', mother: 'm1', child: 'c2' },
-    { father: 'f1', mother: 'm1', child: 'c3' },
+    { id: 'con1', fatherId: 'gf1', motherId: 'gm1', childId: 'f1', conceptionYear: 1964.583 },
+    { id: 'con2', fatherId: 'gf2', motherId: 'gm2', childId: 'm1', conceptionYear: 1967.917 },
+    { id: 'con3', fatherId: 'f1', motherId: 'm1', childId: 'c1', conceptionYear: 1994.5 },
+    { id: 'con4', fatherId: 'f1', motherId: 'm1', childId: 'c2', conceptionYear: 1996.417 },
+    { id: 'con5', fatherId: 'f1', motherId: 'm1', childId: 'c3', conceptionYear: 1998.75 },
     
     // ===== FAMILY 2 - Chen Family =====
-    { father: 'gf3', mother: 'gm3', child: 'f2' },
-    { father: 'gf4', mother: 'gm4', child: 'm2' },
-    { father: 'f2', mother: 'm2', child: 'c4' },
-    { father: 'f2', mother: 'm2', child: 'c5' },
+    { id: 'con6', fatherId: 'gf3', motherId: 'gm3', childId: 'f2', conceptionYear: 1969.5 },
+    { id: 'con7', fatherId: 'gf4', motherId: 'gm4', childId: 'm2', conceptionYear: 1972.083 },
+    { id: 'con8', fatherId: 'f2', motherId: 'm2', childId: 'c4', conceptionYear: 1999.667 },
+    { id: 'con9', fatherId: 'f2', motherId: 'm2', childId: 'c5', conceptionYear: 2002.333 },
 ];
 
 const familyMembers = {

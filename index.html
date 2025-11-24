@@ -232,11 +232,8 @@
         const personMeshes = new Map(); // Map person ID to mesh
         const conceptionLines = []; // Store conception line objects
         
-        // Family member IDs
-        const familyMembers = {
-            smith: ['gf1', 'gm1', 'gf2', 'gm2', 'f1', 'm1', 'c1', 'c2', 'c3'],
-            chen: ['gf3', 'gm3', 'gf4', 'gm4', 'f2', 'm2', 'c4', 'c5']
-        };
+        // Family member IDs (populated from API)
+        let familyMembers = {};
 
         function init() {
             // Scene
@@ -819,63 +816,73 @@
             scene.add(arrow);
         }
 
-        // Sample family data - 3 generations
-        // Note: Births respect biological constraints (minimum 9 months between siblings)
-        const familyData = [
-            // ===== FAMILY 1 - Smith Family (3 generations) =====
-            // Generation 1 - Grandparents (oldest first, z=-8, two generations back)
-            { id: 'gf1', name: 'John Sr.', sex: 'M', birthYear: 1940, birthMonth: 3, deathYear: 2015, x: -4, z: -8 },
-            { id: 'gm1', name: 'Mary', sex: 'F', birthYear: 1942, birthMonth: 7, deathYear: 2018, x: -2, z: -8 },
-            { id: 'gf2', name: 'Robert', sex: 'M', birthYear: 1938, birthMonth: 1, deathYear: 2010, x: 2, z: -8 },
-            { id: 'gm2', name: 'Patricia', sex: 'F', birthYear: 1941, birthMonth: 11, deathYear: null, x: 4, z: -8 },
-            
-            // Generation 2 - Parents (z=-4, one generation back)
-            { id: 'f1', name: 'John Jr.', sex: 'M', birthYear: 1965, birthMonth: 5, deathYear: null, x: -3, z: -4, motherId: 'gm1' },
-            { id: 'm1', name: 'Susan', sex: 'F', birthYear: 1968, birthMonth: 9, deathYear: null, x: 3, z: -4, motherId: 'gm2' },
-            
-            // Generation 3 - Children (youngest, z=0, closest to viewer)
-            { id: 'c1', name: 'Michael', sex: 'M', birthYear: 1995, birthMonth: 3, deathYear: null, x: -2, z: 0, motherId: 'm1' },
-            { id: 'c2', name: 'Emily', sex: 'F', birthYear: 1997, birthMonth: 2, deathYear: null, x: 0, z: 0, motherId: 'm1' },
-            { id: 'c3', name: 'Sarah', sex: 'F', birthYear: 1999, birthMonth: 6, deathYear: null, x: 2, z: 0, motherId: 'm1' },
+        // Data loaded from API
+        let familyData = [];
+        let conceptions = [];
+        let families = [];
 
-            // ===== FAMILY 2 - Chen Family (3 generations) =====
-            // Generation 1 - Grandparents (z=-8, two generations back)
-            { id: 'gf3', name: 'Wei', sex: 'M', birthYear: 1945, birthMonth: 8, deathYear: 2020, x: 8, z: -8 },
-            { id: 'gm3', name: 'Ling', sex: 'F', birthYear: 1947, birthMonth: 4, deathYear: null, x: 10, z: -8 },
-            { id: 'gf4', name: 'Tao', sex: 'M', birthYear: 1943, birthMonth: 12, deathYear: 2019, x: 14, z: -8 },
-            { id: 'gm4', name: 'Mei', sex: 'F', birthYear: 1946, birthMonth: 6, deathYear: null, x: 16, z: -8 },
-            
-            // Generation 2 - Parents (z=-4, one generation back)
-            { id: 'f2', name: 'David', sex: 'M', birthYear: 1970, birthMonth: 3, deathYear: null, x: 9, z: -4, motherId: 'gm3' },
-            { id: 'm2', name: 'Li', sex: 'F', birthYear: 1972, birthMonth: 10, deathYear: null, x: 15, z: -4, motherId: 'gm4' },
-            
-            // Generation 3 - Children (youngest, z=0, aligned with Smith's youngest)
-            { id: 'c4', name: 'Alex', sex: 'M', birthYear: 2000, birthMonth: 5, deathYear: null, x: 10, z: 0, motherId: 'm2' },
-            { id: 'c5', name: 'Maya', sex: 'F', birthYear: 2003, birthMonth: 1, deathYear: null, x: 12, z: 0, motherId: 'm2' },
-        ];
+        // API configuration
+        const API_BASE_URL = 'http://localhost:3001/api';
 
-        const conceptions = [
-            // ===== FAMILY 1 - Smith Family =====
-            // Father connects to parents
-            { father: 'gf1', mother: 'gm1', child: 'f1' },
-            // Mother connects to parents
-            { father: 'gf2', mother: 'gm2', child: 'm1' },
-            // Children connect to parents
-            { father: 'f1', mother: 'm1', child: 'c1' },
-            { father: 'f1', mother: 'm1', child: 'c2' },
-            { father: 'f1', mother: 'm1', child: 'c3' },
-            
-            // ===== FAMILY 2 - Chen Family =====
-            // Father connects to parents
-            { father: 'gf3', mother: 'gm3', child: 'f2' },
-            // Mother connects to parents
-            { father: 'gf4', mother: 'gm4', child: 'm2' },
-            // Children connect to parents
-            { father: 'f2', mother: 'm2', child: 'c4' },
-            { father: 'f2', mother: 'm2', child: 'c5' },
-        ];
+        // Load data from MongoDB API
+        async function loadDataFromAPI() {
+            try {
+                document.getElementById('loading').innerHTML = 'Loading family data...';
+                
+                // Fetch all data in parallel
+                const [personsResponse, conceptionsResponse, familiesResponse] = await Promise.all([
+                    fetch(`${API_BASE_URL}/persons`),
+                    fetch(`${API_BASE_URL}/conceptions`),
+                    fetch(`${API_BASE_URL}/families`)
+                ]);
+
+                if (!personsResponse.ok || !conceptionsResponse.ok || !familiesResponse.ok) {
+                    throw new Error('Failed to fetch data from API');
+                }
+
+                const persons = await personsResponse.json();
+                const conceptionsData = await conceptionsResponse.json();
+                families = await familiesResponse.json();
+
+                // Transform MongoDB data to visualization format
+                familyData = persons.map(person => ({
+                    id: person.id,
+                    name: person.name,
+                    sex: person.sex === 'male' ? 'M' : 'F',
+                    birthYear: person.birthYear,
+                    birthMonth: person.birthMonth,
+                    deathYear: person.deathYear,
+                    motherId: person.motherId,
+                    fatherId: person.fatherId,
+                    x: person.x || 0,
+                    z: person.z || 0
+                }));
+
+                // Transform conceptions data
+                conceptions = conceptionsData.map(c => ({
+                    father: c.fatherId,
+                    mother: c.motherId,
+                    child: c.childId
+                }));
+
+                console.log(`Loaded ${familyData.length} persons, ${conceptions.length} conceptions, ${families.length} families from API`);
+                return true;
+            } catch (error) {
+                console.error('Error loading data from API:', error);
+                document.getElementById('loading').innerHTML = 
+                    'Error loading data from API. Make sure the server is running on port 3001.<br><br>' + 
+                    error.message + '<br><br>Run: npm start';
+                document.getElementById('loading').style.background = 'rgba(255, 100, 0, 0.8)';
+                return false;
+            }
+        }
 
         function createFamily() {
+            // Populate familyMembers from loaded families data
+            families.forEach(family => {
+                familyMembers[family.id] = family.members;
+            });
+
             // Create all people
             familyData.forEach(person => createPerson(person));
 
@@ -1322,15 +1329,30 @@
         }
 
         // Initialize and start
-        try {
-            init();
-            createFamily();
-            animate();
-        } catch (error) {
-            console.error('Error initializing visualization:', error);
-            document.getElementById('loading').innerHTML = 'Error loading visualization. Check console for details.<br><br>' + error.message;
-            document.getElementById('loading').style.background = 'rgba(255, 0, 0, 0.7)';
+        async function startVisualization() {
+            try {
+                init();
+                
+                // Load data from API
+                const dataLoaded = await loadDataFromAPI();
+                if (!dataLoaded) {
+                    return; // Error already displayed by loadDataFromAPI
+                }
+                
+                createFamily();
+                animate();
+                
+                // Hide loading screen
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error initializing visualization:', error);
+                document.getElementById('loading').innerHTML = 'Error loading visualization. Check console for details.<br><br>' + error.message;
+                document.getElementById('loading').style.background = 'rgba(255, 0, 0, 0.7)';
+            }
         }
+
+        // Start the visualization
+        startVisualization();
     </script>
 </body>
 </html>
