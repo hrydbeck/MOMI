@@ -315,8 +315,12 @@
             // Add grid at present (top)
             addPresentGrid();
 
-            // Axes helper
+            // Axes helper at origin of life (when perspective enabled) or at 0,0,0
             const axesHelper = new THREE.AxesHelper(5);
+            if (perspectiveEnabled) {
+                const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+                axesHelper.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
+            }
             scene.add(axesHelper);
 
             // Add axis labels
@@ -433,7 +437,7 @@
             const baseZ = -6;
             
             // Create vertical axis line - bottom (origin/past) to top (present)
-            const maxHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            const presentHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
             const bottomHeight = perspectiveEnabled ? (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE : 0;
             
             // Apply perspective to axis endpoints
@@ -443,7 +447,7 @@
             
             const axisPoints = [
                 new THREE.Vector3(bottomPos.x, bottomHeight, bottomPos.z),
-                new THREE.Vector3(topPos.x, maxHeight, topPos.z)
+                new THREE.Vector3(topPos.x, presentHeight, topPos.z)
             ];
             const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisPoints);
             const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
@@ -1653,6 +1657,10 @@
             // Re-add scene elements
             addPresentGrid();
             const axesHelper = new THREE.AxesHelper(5);
+            if (perspectiveEnabled) {
+                const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+                axesHelper.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
+            }
             scene.add(axesHelper);
             addAxisLabels();
             addTimeAxis();
