@@ -278,6 +278,7 @@
         const lifeEventMarkers = []; // Store life event markers and lines
         const genomeVisualizations = []; // Store genome visualizations
         let genomesVisible = false; // Toggle for genome visibility
+        let genomeLegend = null; // Store reference to genome legend sprite
         
         // Family member IDs (populated from API)
         let familyMembers = {};
@@ -895,6 +896,12 @@
         }
         
         function createGenomeLegend() {
+            // Remove existing legend if any
+            if (genomeLegend) {
+                scene.remove(genomeLegend);
+                genomeLegend = null;
+            }
+            
             // Create a legend sprite showing genome information
             const canvas = document.createElement('canvas');
             canvas.width = 320;
@@ -949,7 +956,7 @@
             sprite.userData = { isGenomeLegend: true };
             
             scene.add(sprite);
-            genomeVisualizations.push(sprite);
+            genomeLegend = sprite; // Store reference separately
         }
         
         function addLifeEventsMarkers(personId, x, z, birthDecimal, topYear, birthHeight, personHeight, centerPos, rotation) {
@@ -2132,9 +2139,17 @@
                 genome.visible = genomesVisible;
             });
             
-            // Add or remove legend
+            // Create or toggle legend
             if (genomesVisible) {
-                createGenomeLegend();
+                if (!genomeLegend) {
+                    createGenomeLegend();
+                } else {
+                    genomeLegend.visible = true;
+                }
+            } else {
+                if (genomeLegend) {
+                    genomeLegend.visible = false;
+                }
             }
         }
         
