@@ -902,6 +902,8 @@
                 genomeLegend = null;
             }
             
+            console.log('Creating genome legend...');
+            
             // Create a legend sprite showing genome information
             const canvas = document.createElement('canvas');
             canvas.width = 320;
@@ -952,11 +954,16 @@
             sprite.scale.set(4, 1.75, 1);
             sprite.position.set(-8, 25, -5);
             
+            console.log('Legend created at position:', sprite.position);
+            console.log('Legend scale:', sprite.scale);
+            console.log('Legend visible:', sprite.visible);
+            
             sprite.visible = true; // Always visible when created
             sprite.userData = { isGenomeLegend: true };
             
             scene.add(sprite);
             genomeLegend = sprite; // Store reference separately
+            console.log('Legend added to scene, total children:', scene.children.length);
         }
         
         function addLifeEventsMarkers(personId, x, z, birthDecimal, topYear, birthHeight, personHeight, centerPos, rotation) {
