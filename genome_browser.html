@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genome Browser - Ribosomal Gene</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #81d4fa;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4fc3f7;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .label {
+            font-weight: bold;
+            color: #81d4fa;
+        }
+        
+        .genome-container {
+            margin-bottom: 40px;
+        }
+        
+        .genome-title {
+            font-size: 24px;
+            color: #ff6b9d;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff6b9d;
+        }
+        
+        .genome-title.paternal {
+            color: #4169e1;
+            border-bottom-color: #4169e1;
+        }
+        
+        .chromosome-view {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .sequence-container {
+            margin: 20px 0;
+        }
+        
+        .sequence-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #81d4fa;
+        }
+        
+        .sequence {
+            font-size: 16px;
+            line-height: 1.8;
+            word-break: break-all;
+            letter-spacing: 3px;
+        }
+        
+        .base {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .base-A { background: #ff4444; color: white; }
+        .base-T { background: #44ff44; color: black; }
+        .base-G { background: #4444ff; color: white; }
+        .base-C { background: #ffff44; color: black; }
+        
+        .gene-annotation {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .gene-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4caf50;
+            margin-bottom: 10px;
+        }
+        
+        .gene-description {
+            color: #a5d6a7;
+            line-height: 1.6;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+        
+        .stat-label {
+            color: #81d4fa;
+            margin-top: 5px;
+        }
+        
+        .highlight-gene {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4caf50;
+            padding: 2px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 Genome Browser</h1>
+        <div class="subtitle">Ribosomal RNA Gene Analysis</div>
+        
+        <div class="info-panel">
+            <div class="info-row">
+                <span class="label">Individual ID:</span>
+                <span id="person-id">Loading...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Genome Size:</span>
+                <span id="genome-size">Loading...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Current View:</span>
+                <span>Ribosomal RNA Gene (rRNA)</span>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ff4444;"></div>
+                <span>Adenine (A)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #44ff44;"></div>
+                <span>Thymine (T)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #4444ff;"></div>
+                <span>Guanine (G)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ffff44;"></div>
+                <span>Cytosine (C)</span>
+            </div>
+        </div>
+        
+        <!-- Maternal Genome -->
+        <div class="genome-container">
+            <div class="genome-title">♀ Maternal Chromosome</div>
+            <div class="chromosome-view">
+                <div class="gene-annotation">
+                    <div class="gene-name">18S Ribosomal RNA Gene</div>
+                    <div class="gene-description">
+                        This gene encodes the RNA component of the small subunit (40S) of eukaryotic ribosomes.
+                        The 18S rRNA is essential for protein synthesis and is highly conserved across species.
+                        Location: Positions 5-14 (highlighted below)
+                    </div>
+                </div>
+                
+                <div class="sequence-container">
+                    <div class="sequence-label">Full Sequence (Maternal):</div>
+                    <div class="sequence" id="maternal-sequence">Loading...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paternal Genome -->
+        <div class="genome-container">
+            <div class="genome-title paternal">♂ Paternal Chromosome</div>
+            <div class="chromosome-view">
+                <div class="gene-annotation">
+                    <div class="gene-name">18S Ribosomal RNA Gene</div>
+                    <div class="gene-description">
+                        This gene encodes the RNA component of the small subunit (40S) of eukaryotic ribosomes.
+                        The 18S rRNA is essential for protein synthesis and is highly conserved across species.
+                        Location: Positions 5-14 (highlighted below)
+                    </div>
+                </div>
+                
+                <div class="sequence-container">
+                    <div class="sequence-label">Full Sequence (Paternal):</div>
+                    <div class="sequence" id="paternal-sequence">Loading...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="gc-content-maternal">0%</div>
+                <div class="stat-label">Maternal GC Content</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="gc-content-paternal">0%</div>
+                <div class="stat-label">Paternal GC Content</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="gene-count">1</div>
+                <div class="stat-label">Genes Displayed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-bases">0</div>
+                <div class="stat-label">Total Base Pairs</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get genome data from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const genomeDataJson = urlParams.get('data');
+        
+        if (genomeDataJson) {
+            try {
+                const genomeData = JSON.parse(decodeURIComponent(genomeDataJson));
+                displayGenome(genomeData);
+            } catch (e) {
+                console.error('Error parsing genome data:', e);
+                document.getElementById('person-id').textContent = 'Error loading data';
+            }
+        } else {
+            // Demo data if no parameters provided
+            const demoData = {
+                personId: 'demo-001',
+                maternal: [0, 1, 2, 3, 0, 2, 1, 3, 2, 0, 1, 3, 0, 2, 1, 3, 0, 1, 2, 3],
+                paternal: [1, 0, 3, 2, 1, 3, 0, 2, 3, 1, 0, 2, 1, 3, 0, 2, 1, 0, 3, 2],
+                baseNames: ['A', 'T', 'G', 'C']
+            };
+            displayGenome(demoData);
+        }
+        
+        function displayGenome(data) {
+            document.getElementById('person-id').textContent = data.personId;
+            document.getElementById('genome-size').textContent = `${data.maternal.length} base pairs`;
+            document.getElementById('total-bases').textContent = data.maternal.length * 2;
+            
+            // Display maternal sequence
+            const maternalSeq = document.getElementById('maternal-sequence');
+            maternalSeq.innerHTML = '';
+            data.maternal.forEach((baseIndex, i) => {
+                const baseName = data.baseNames[baseIndex];
+                const span = document.createElement('span');
+                span.className = `base base-${baseName}`;
+                span.textContent = baseName;
+                
+                // Highlight ribosomal gene region (positions 5-14)
+                if (i >= 4 && i <= 13) {
+                    span.classList.add('highlight-gene');
+                }
+                
+                maternalSeq.appendChild(span);
+            });
+            
+            // Display paternal sequence
+            const paternalSeq = document.getElementById('paternal-sequence');
+            paternalSeq.innerHTML = '';
+            data.paternal.forEach((baseIndex, i) => {
+                const baseName = data.baseNames[baseIndex];
+                const span = document.createElement('span');
+                span.className = `base base-${baseName}`;
+                span.textContent = baseName;
+                
+                // Highlight ribosomal gene region (positions 5-14)
+                if (i >= 4 && i <= 13) {
+                    span.classList.add('highlight-gene');
+                }
+                
+                paternalSeq.appendChild(span);
+            });
+            
+            // Calculate GC content
+            const gcContentMaternal = calculateGCContent(data.maternal);
+            const gcContentPaternal = calculateGCContent(data.paternal);
+            
+            document.getElementById('gc-content-maternal').textContent = gcContentMaternal + '%';
+            document.getElementById('gc-content-paternal').textContent = gcContentPaternal + '%';
+        }
+        
+        function calculateGCContent(genome) {
+            // G = 2, C = 3 in our encoding
+            const gcCount = genome.filter(base => base === 2 || base === 3).length;
+            return Math.round((gcCount / genome.length) * 100);
+        }
+    </script>
+</body>
+</html>

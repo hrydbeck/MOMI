@@ -795,16 +795,13 @@
         }
         
         function addDiploidGenomeVisualization(personId, centerPos, personHeight, sex, motherId, fatherId) {
-            // Create two adjacent barcodes representing maternal and paternal chromosomes
+            // Create compact genome visualization as small colored squares inside the person stack
             const genomeGroup = new THREE.Group();
             
-            // Position genome marker to the side of the person
-            const offsetX = 1.8;
-            const barcodeHeight = Math.min(personHeight * 0.6, 3);
-            const numBars = 30; // Number of bars in each barcode
-            const barWidth = 0.08;
-            const barGap = 0.01;
-            const barcodeSpacing = 0.15; // Space between maternal and paternal barcodes
+            const numBars = 20; // Number of squares per chromosome
+            const squareSize = 0.04;
+            const squareGap = 0.005;
+            const chromSpacing = 0.06; // Space between maternal and paternal
             
             // Four DNA base colors: Adenine (red), Thymine (green), Guanine (blue), Cytosine (yellow)
             const baseColors = [
@@ -828,111 +825,69 @@
             const maternalGenome = generateRandomGenome(numBars);
             const paternalGenome = generateRandomGenome(numBars);
             
-            // Create maternal barcode (left)
-            const barHeight = barcodeHeight / numBars;
+            // Store genome data for genome browser
+            const genomeData = {
+                personId: personId,
+                maternal: maternalGenome,
+                paternal: paternalGenome,
+                baseColors: baseColors,
+                baseNames: baseNames
+            };
+            
+            // Create maternal chromosome (left column)
             for (let i = 0; i < numBars; i++) {
                 const baseIndex = maternalGenome[i];
                 const color = baseColors[baseIndex];
                 
-                const geometry = new THREE.BoxGeometry(barWidth, barHeight - barGap, 0.05);
+                const geometry = new THREE.BoxGeometry(squareSize, squareSize, squareSize);
                 const material = new THREE.MeshPhongMaterial({ 
                     color: color,
                     emissive: color,
-                    emissiveIntensity: 0.3
+                    emissiveIntensity: 0.4
                 });
                 
-                const bar = new THREE.Mesh(geometry, material);
-                bar.position.set(
-                    -barcodeSpacing / 2,
-                    i * barHeight - barcodeHeight / 2,
+                const square = new THREE.Mesh(geometry, material);
+                square.position.set(
+                    -chromSpacing / 2,
+                    i * (squareSize + squareGap) - (numBars * (squareSize + squareGap)) / 2,
                     0
                 );
-                genomeGroup.add(bar);
+                genomeGroup.add(square);
             }
             
-            // Create paternal barcode (right)
+            // Create paternal chromosome (right column)
             for (let i = 0; i < numBars; i++) {
                 const baseIndex = paternalGenome[i];
                 const color = baseColors[baseIndex];
                 
-                const geometry = new THREE.BoxGeometry(barWidth, barHeight - barGap, 0.05);
+                const geometry = new THREE.BoxGeometry(squareSize, squareSize, squareSize);
                 const material = new THREE.MeshPhongMaterial({ 
                     color: color,
                     emissive: color,
-                    emissiveIntensity: 0.3
+                    emissiveIntensity: 0.4
                 });
                 
-                const bar = new THREE.Mesh(geometry, material);
-                bar.position.set(
-                    barcodeSpacing / 2,
-                    i * barHeight - barcodeHeight / 2,
+                const square = new THREE.Mesh(geometry, material);
+                square.position.set(
+                    chromSpacing / 2,
+                    i * (squareSize + squareGap) - (numBars * (squareSize + squareGap)) / 2,
                     0
                 );
-                genomeGroup.add(bar);
+                genomeGroup.add(square);
             }
             
-            // Add label with color legend
-            const labelCanvas = document.createElement('canvas');
-            labelCanvas.width = 320;
-            labelCanvas.height = 140;
-            const ctx = labelCanvas.getContext('2d');
-            
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
-            
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 20px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Diploid Genome (2n)', labelCanvas.width/2, 25);
-            
-            // Color legend for DNA bases
-            ctx.font = '16px Arial';
-            const legendY = 50;
-            const spacing = 70;
-            
-            // Draw legend boxes and labels
-            const legendColors = [
-                {color: '#ff4444', label: 'A', x: 20},
-                {color: '#44ff44', label: 'T', x: 20 + spacing},
-                {color: '#4444ff', label: 'G', x: 20 + spacing * 2},
-                {color: '#ffff44', label: 'C', x: 20 + spacing * 3}
-            ];
-            
-            legendColors.forEach(item => {
-                ctx.fillStyle = item.color;
-                ctx.fillRect(item.x, legendY, 15, 15);
-                ctx.fillStyle = '#000000';
-                ctx.fillText(item.label, item.x + 27, legendY + 12);
-            });
-            
-            ctx.font = '18px Arial';
-            ctx.fillStyle = '#ff1493';
-            ctx.fillText('♀ Maternal', labelCanvas.width/2 - 60, 95);
-            ctx.fillStyle = '#1e90ff';
-            ctx.fillText('♂ Paternal', labelCanvas.width/2 + 60, 95);
-            
-            const labelTexture = new THREE.CanvasTexture(labelCanvas);
-            const labelMaterial = new THREE.SpriteMaterial({ 
-                map: labelTexture,
-                transparent: true,
-                opacity: 0.9
-            });
-            const labelSprite = new THREE.Sprite(labelMaterial);
-            labelSprite.scale.set(1.0, 0.45, 1);
-            labelSprite.position.set(0, barcodeHeight / 2 + 0.5, 0);
-            genomeGroup.add(labelSprite);
-            
-            // Position the genome group
+            // Position the genome group inside the person stack (slightly forward)
             genomeGroup.position.set(
-                centerPos.x + offsetX,
+                centerPos.x,
                 centerPos.y,
-                centerPos.z
+                centerPos.z + 0.35
             );
             
             genomeGroup.visible = genomesVisible;
             genomeGroup.userData = {
                 isGenome: true,
-                personId: personId
+                personId: personId,
+                genomeData: genomeData
             };
             
             scene.add(genomeGroup);
@@ -1578,8 +1533,22 @@
             const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
 
-            // Check for life event markers first
+            // Check for genome visualizations first
             const allObjects = scene.children;
+            const genomeIntersects = raycaster.intersectObjects(
+                allObjects.filter(obj => obj.userData.isGenome),
+                true // Check children
+            );
+            
+            if (genomeIntersects.length > 0) {
+                const genomeGroup = genomeIntersects[0].object.parent;
+                if (genomeGroup && genomeGroup.userData.genomeData) {
+                    openGenomeBrowser(genomeGroup.userData.genomeData);
+                    return;
+                }
+            }
+
+            // Check for life event markers
             const lifeEventIntersects = raycaster.intersectObjects(allObjects.filter(obj => obj.userData.isLifeEvent));
             
             if (lifeEventIntersects.length > 0) {
