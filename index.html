@@ -536,6 +536,29 @@
             personMeshes.set(id, mesh);
             scene.add(mesh);
 
+            // Add germline substack (reproductive cells - where gametes come from)
+            const germlineHeight = height * 0.9; // Germline runs most of the body height
+            const germlineWidth = PERSON_WIDTH * 0.15; // Thin central line
+            const germlineDepth = PERSON_DEPTH * 0.15;
+            
+            const germlineGeometry = new THREE.BoxGeometry(germlineWidth, germlineHeight, germlineDepth);
+            const germlineMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffaa00, // Orange/gold for germline
+                shininess: 50,
+                transparent: true,
+                opacity: 0.8,
+                emissive: new THREE.Color(0xffaa00),
+                emissiveIntensity: 0.3
+            });
+            
+            const germlineMesh = new THREE.Mesh(germlineGeometry, germlineMaterial);
+            germlineMesh.position.set(x, yPosition, z);
+            germlineMesh.userData = { isGermline: true, personId: id };
+            scene.add(germlineMesh);
+            
+            // Store germline position for conception connections
+            mesh.userData.germlinePosition = { x, y: yPosition, z };
+
             // Add gestation period visualization (9 months growing inside mother)
             if (motherId) {
                 addGestationStack(data, mesh.userData.conceptionHeight, birthHeight, color);
@@ -627,6 +650,7 @@
                 segment.userData = { 
                     isGestation: true, 
                     childId: data.id,
+                    motherId: motherId,
                     childName: data.name,
                     motherName: mother.userData.name,
                     weekStart: weekStart,
@@ -713,12 +737,12 @@
             // Create points for the connection at conception time (when sperm fertilizes egg)
             const points = [];
             
-            // Father's position at conception time
+            // Father's GERMLINE position at conception time (sperm comes from germline)
             const fatherX = father.position.x;
             const fatherZ = father.position.z;
             points.push(new THREE.Vector3(fatherX, conceptionHeight, fatherZ));
 
-            // Mother's position at conception time (this is where the point/fertilized egg starts)
+            // Mother's GERMLINE position at conception time (egg comes from germline, fertilized egg starts here)
             const motherX = mother.position.x;
             const motherZ = mother.position.z;
             points.push(new THREE.Vector3(motherX, conceptionHeight, motherZ));
@@ -878,7 +902,40 @@
             
             if (gestationIntersects.length > 0) {
                 const gestationSegment = gestationIntersects[0].object;
-                displayGestationInfo(gestationSegment.userData);
+                const data = gestationSegment.userData;
+                
+                console.log('Clicked gestation segment:', data);
+                
+                // Open birth view in new window
+                const childMesh = personMeshes.get(data.childId);
+                const motherMesh = personMeshes.get(data.motherId);
+                
+                if (childMesh && motherMesh) {
+                    const childData = childMesh.userData;
+                    const params = new URLSearchParams({
+                        childId: data.childId,
+                        childName: data.childName,
+                        motherName: data.motherName,
+                        birthYear: childData.birthYear,
+                        birthMonth: childData.birthMonth || 6,
+                        sex: childData.sex,
+                        conceptionYear: childData.conceptionHeight / YEAR_SCALE
+                    });
+                    
+                    const url = `birth_view.html?${params.toString()}`;
+                    console.log('Opening:', url);
+                    
+                    // Try to open in new tab - user may need to allow popups
+                    const newWindow = window.open(url, '_blank');
+                    
+                    if (!newWindow) {
+                        // Popup blocked - show message
+                        alert('Please allow popups for this site to view the birth journey.\n\nOr right-click on a gestation segment and select "Open in new tab".');
+                    }
+                } else {
+                    console.error('Could not find child or mother mesh:', data.childId, data.motherId);
+                }
+                
                 return;
             }
             
@@ -1070,6 +1127,178 @@
             `;
             
             document.getElementById('person-details').innerHTML = html;
+            
+            // Create focused birth visualization
+            createBirthFocusView(gestationData);
+        }
+        
+        function createBirthFocusView(gestationData) {
+            // Clear any existing focus view
+            scene.children.filter(obj => obj.userData.isFocusView).forEach(obj => scene.remove(obj));
+            
+            const { childId, motherId, childName, motherName } = gestationData;
+            
+            // Get child and mother data
+            const childMesh = personMeshes.get(childId);
+            const motherMesh = personMeshes.get(motherId);
+            
+            if (!childMesh || !motherMesh) return;
+            
+            const childData = childMesh.userData;
+            const motherData = motherMesh.userData;
+            
+            // Calculate timeline positions for focused view
+            const conceptionHeight = childData.conceptionHeight;
+            const birthHeight = childData.birthHeight;
+            const gestationDuration = birthHeight - conceptionHeight; // 9 months
+            const postBirthDuration = gestationDuration * 0.5; // Show 4.5 months after birth
+            
+            // Position focused view to the right of main scene
+            const focusX = 20;
+            const focusZ = 0;
+            const timelineStart = conceptionHeight;
+            
+            // Create mother's stack (partial, just during gestation)
+            const motherStackHeight = gestationDuration * 1.2; // Extend a bit beyond gestation
+            const motherStackGeometry = new THREE.BoxGeometry(
+                PERSON_WIDTH * 1.5,
+                motherStackHeight,
+                PERSON_DEPTH * 1.5
+            );
+            const motherStackMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff69b4,
+                transparent: true,
+                opacity: 0.3,
+                wireframe: false
+            });
+            const motherStack = new THREE.Mesh(motherStackGeometry, motherStackMaterial);
+            motherStack.position.set(focusX, conceptionHeight + motherStackHeight / 2, focusZ);
+            motherStack.userData.isFocusView = true;
+            scene.add(motherStack);
+            
+            // Create growing child inside mother (tapered from point to full size)
+            const segments = 10;
+            const segmentHeight = gestationDuration / segments;
+            const childColor = childData.sex === 'F' ? 0xff69b4 : 0x4169e1;
+            
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments;
+                const nextT = (i + 1) / segments;
+                
+                const widthTop = PERSON_WIDTH * nextT;
+                const depthTop = PERSON_DEPTH * nextT;
+                
+                const shape = new THREE.Shape();
+                const hw = widthTop / 2;
+                const hd = depthTop / 2;
+                
+                // Rectangle for simplicity in focus view
+                shape.moveTo(-hw, -hd);
+                shape.lineTo(hw, -hd);
+                shape.lineTo(hw, hd);
+                shape.lineTo(-hw, hd);
+                
+                const extrudeSettings = {
+                    depth: segmentHeight,
+                    bevelEnabled: false,
+                    steps: 1
+                };
+                
+                const segmentGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                segmentGeometry.rotateX(Math.PI / 2);
+                
+                const segmentMaterial = new THREE.MeshPhongMaterial({
+                    color: childColor,
+                    transparent: true,
+                    opacity: 0.7,
+                    shininess: 30
+                });
+                
+                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                segment.position.set(
+                    focusX,
+                    conceptionHeight + i * segmentHeight + segmentHeight / 2,
+                    focusZ
+                );
+                segment.userData.isFocusView = true;
+                scene.add(segment);
+            }
+            
+            // Add birth transition marker
+            const birthMarkerGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const birthMarkerMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffaa,
+                emissive: 0x00ffaa,
+                emissiveIntensity: 0.5
+            });
+            const birthMarker = new THREE.Mesh(birthMarkerGeometry, birthMarkerMaterial);
+            birthMarker.position.set(focusX, birthHeight, focusZ);
+            birthMarker.userData.isFocusView = true;
+            scene.add(birthMarker);
+            
+            // Create child's independent stack (post-birth)
+            const postBirthStackGeometry = new THREE.BoxGeometry(
+                PERSON_WIDTH,
+                postBirthDuration,
+                PERSON_DEPTH
+            );
+            const postBirthStackMaterial = new THREE.MeshPhongMaterial({
+                color: childColor,
+                transparent: true,
+                opacity: 0.8,
+                shininess: 30
+            });
+            const postBirthStack = new THREE.Mesh(postBirthStackGeometry, postBirthStackMaterial);
+            postBirthStack.position.set(
+                focusX + 2, // Offset to the right to show separation
+                birthHeight + postBirthDuration / 2,
+                focusZ
+            );
+            postBirthStack.userData.isFocusView = true;
+            scene.add(postBirthStack);
+            
+            // Add arrow showing birth transition
+            const birthArrowPoints = [
+                new THREE.Vector3(focusX, birthHeight, focusZ),
+                new THREE.Vector3(focusX + 2, birthHeight, focusZ)
+            ];
+            const birthArrowGeometry = new THREE.BufferGeometry().setFromPoints(birthArrowPoints);
+            const birthArrowMaterial = new THREE.LineBasicMaterial({
+                color: 0x00ffaa,
+                linewidth: 3
+            });
+            const birthArrow = new THREE.Line(birthArrowGeometry, birthArrowMaterial);
+            birthArrow.userData.isFocusView = true;
+            scene.add(birthArrow);
+            
+            // Add text labels
+            addFocusLabel('CONCEPTION', focusX, conceptionHeight - 0.5, focusZ);
+            addFocusLabel('BIRTH', focusX + 1, birthHeight + 0.5, focusZ);
+            addFocusLabel(`${childName}'s Journey`, focusX, birthHeight + postBirthDuration + 1, focusZ);
+            
+            // Zoom camera to focus view
+            camera.position.set(focusX + 8, birthHeight, focusZ + 8);
+            controls.target.set(focusX, birthHeight, focusZ);
+            controls.update();
+        }
+        
+        function addFocusLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 256;
+            canvas.height = 64;
+            context.fillStyle = '#ffffff';
+            context.font = 'Bold 32px Arial';
+            context.textAlign = 'center';
+            context.fillText(text, 128, 40);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.position.set(x, y, z);
+            sprite.scale.set(2, 0.5, 1);
+            sprite.userData.isFocusView = true;
+            scene.add(sprite);
         }
 
         function resetCamera() {

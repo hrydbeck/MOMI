@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birth Journey - MOMI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e1a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 350px;
+            border: 2px solid #00ffaa;
+        }
+
+        #info-panel h2 {
+            color: #00ffaa;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        #info-panel p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        #info-panel .label {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        #info-panel .value {
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .back-button {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            padding: 15px 30px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: #45a049;
+        }
+
+        #timeline-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #ffaa00;
+        }
+
+        #timeline-info h3 {
+            color: #ffaa00;
+            margin-bottom: 10px;
+        }
+
+        #timeline-info .stage {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        #timeline-info .stage.active {
+            background: rgba(0, 255, 170, 0.2);
+            border-left: 3px solid #00ffaa;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="info-panel">
+        <h2 id="child-name">Loading...</h2>
+        <div class="label">Mother</div>
+        <div class="value" id="mother-name">-</div>
+        <div class="label">Birth Date</div>
+        <div class="value" id="birth-date">-</div>
+        <div class="label">Conception to Birth</div>
+        <div class="value">~40 weeks (9 months)</div>
+        <div class="label">Current View</div>
+        <div class="value" id="current-view">Full Journey</div>
+    </div>
+
+    <div id="timeline-info">
+        <h3>Development Timeline</h3>
+        <div class="stage">
+            <strong>Conception</strong><br>
+            Fertilization occurs
+        </div>
+        <div class="stage">
+            <strong>1st Trimester (0-13 weeks)</strong><br>
+            Embryonic development, organs form
+        </div>
+        <div class="stage">
+            <strong>2nd Trimester (14-26 weeks)</strong><br>
+            Rapid growth, movement begins
+        </div>
+        <div class="stage">
+            <strong>3rd Trimester (27-40 weeks)</strong><br>
+            Final development, preparing for birth
+        </div>
+        <div class="stage">
+            <strong>Birth</strong><br>
+            Transition to independent life
+        </div>
+    </div>
+
+    <button class="back-button" onclick="window.close()">← Back to Family Tree</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // Get data from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const childId = urlParams.get('childId');
+        const childName = urlParams.get('childName');
+        const motherName = urlParams.get('motherName');
+        const birthYear = parseInt(urlParams.get('birthYear'));
+        const birthMonth = parseInt(urlParams.get('birthMonth'));
+        const sex = urlParams.get('sex');
+        const conceptionYear = parseFloat(urlParams.get('conceptionYear'));
+
+        // Update info panel
+        document.getElementById('child-name').textContent = childName + "'s Birth Journey";
+        document.getElementById('mother-name').textContent = motherName;
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        document.getElementById('birth-date').textContent = `${monthNames[birthMonth - 1]} ${birthYear}`;
+
+        // Three.js setup
+        let scene, camera, renderer, controls;
+        const YEAR_SCALE = 0.1;
+        const PERSON_WIDTH = 1.0;
+        const PERSON_DEPTH = 0.8;
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0e1a);
+
+            // Camera
+            const container = document.getElementById('canvas-container');
+            camera = new THREE.PerspectiveCamera(
+                60,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(8, 5, 8);
+            camera.lookAt(0, 5, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 20, 10);
+            scene.add(directionalLight);
+
+            // Create visualization
+            createBirthVisualization();
+
+            // Handle resize
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createBirthVisualization() {
+            const birthDecimal = birthYear + (birthMonth - 1) / 12;
+            const conceptionDecimal = birthDecimal - (9/12);
+            
+            // Heights in scene units - STRETCH gestation to fill screen
+            const conceptionHeight = 0;
+            const birthHeight = 15; // Much larger - ~15 units for 9 months (was 0.075)
+            const gestationDuration = birthHeight - conceptionHeight;
+            const postBirthDuration = 3; // Fixed ~3 units for 6 months post-birth
+
+            // Mother's stack during gestation
+            const motherStackHeight = gestationDuration * 1.05;
+            const motherGeometry = new THREE.BoxGeometry(
+                PERSON_WIDTH * 2,
+                motherStackHeight,
+                PERSON_DEPTH * 2
+            );
+            const motherMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff69b4,
+                transparent: true,
+                opacity: 0.25,
+                wireframe: false,
+                side: THREE.DoubleSide
+            });
+            const motherMesh = new THREE.Mesh(motherGeometry, motherMaterial);
+            motherMesh.position.set(0, conceptionHeight + motherStackHeight / 2, 0);
+            scene.add(motherMesh);
+
+            // Mother's edges for clarity
+            const motherEdges = new THREE.EdgesGeometry(motherGeometry);
+            const motherEdgesMaterial = new THREE.LineBasicMaterial({ color: 0xff69b4, linewidth: 2 });
+            const motherWireframe = new THREE.LineSegments(motherEdges, motherEdgesMaterial);
+            motherWireframe.position.copy(motherMesh.position);
+            scene.add(motherWireframe);
+
+            // Mother's germline
+            const motherGermlineGeometry = new THREE.BoxGeometry(
+                PERSON_WIDTH * 0.3,
+                motherStackHeight,
+                PERSON_DEPTH * 0.3
+            );
+            const germlineMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffaa00,
+                emissive: 0xffaa00,
+                emissiveIntensity: 0.3,
+                transparent: true,
+                opacity: 0.7
+            });
+            const motherGermline = new THREE.Mesh(motherGermlineGeometry, germlineMaterial);
+            motherGermline.position.copy(motherMesh.position);
+            scene.add(motherGermline);
+
+            // Growing child inside mother (tapered) - with MORE segments for detail
+            const childColor = sex === 'F' ? 0xff69b4 : 0x4169e1;
+            const segments = 40; // More segments for smoother growth visualization
+            const segmentHeight = gestationDuration / segments;
+
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments;
+                const nextT = (i + 1) / segments;
+                
+                const widthTop = PERSON_WIDTH * nextT;
+                const depthTop = PERSON_DEPTH * nextT;
+                
+                const shape = new THREE.Shape();
+                const hw = widthTop / 2;
+                const hd = depthTop / 2;
+                
+                shape.moveTo(-hw, -hd);
+                shape.lineTo(hw, -hd);
+                shape.lineTo(hw, hd);
+                shape.lineTo(-hw, hd);
+                
+                const extrudeSettings = {
+                    depth: segmentHeight,
+                    bevelEnabled: false,
+                    steps: 1
+                };
+                
+                const segmentGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                segmentGeometry.rotateX(Math.PI / 2);
+                
+                const segmentMaterial = new THREE.MeshPhongMaterial({
+                    color: childColor,
+                    transparent: true,
+                    opacity: 0.8,
+                    shininess: 30
+                });
+                
+                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                segment.position.set(
+                    0,
+                    conceptionHeight + i * segmentHeight + segmentHeight / 2,
+                    0
+                );
+                scene.add(segment);
+            }
+
+            // Add trimester boundary markers
+            const trimester1End = gestationDuration * (13/40); // Week 13
+            const trimester2End = gestationDuration * (27/40); // Week 27
+            
+            addTrimesterMarker(trimester1End, '1st Trimester Ends (Week 13)', 0xff6b6b);
+            addTrimesterMarker(trimester2End, '2nd Trimester Ends (Week 27)', 0xffa500);
+            
+            // Add developmental milestone markers
+            addMilestoneMarker(gestationDuration * (4/40), 'Heart begins beating', -2.5);
+            addMilestoneMarker(gestationDuration * (8/40), 'Embryo → Fetus', -2.5);
+            addMilestoneMarker(gestationDuration * (12/40), 'Sex determinable', 2.5);
+            addMilestoneMarker(gestationDuration * (16/40), 'Movement felt', 2.5);
+            addMilestoneMarker(gestationDuration * (20/40), 'Halfway point', -2.5);
+            addMilestoneMarker(gestationDuration * (24/40), 'Eyes open', 2.5);
+            addMilestoneMarker(gestationDuration * (28/40), 'Brain develops rapidly', -2.5);
+            addMilestoneMarker(gestationDuration * (32/40), 'Bones harden', 2.5);
+            addMilestoneMarker(gestationDuration * (36/40), 'Ready for birth', -2.5);
+
+            // Birth marker - large glowing sphere
+            const birthMarkerGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const birthMarkerMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffaa,
+                emissive: 0x00ffaa,
+                emissiveIntensity: 1
+            });
+            const birthMarker = new THREE.Mesh(birthMarkerGeometry, birthMarkerMaterial);
+            birthMarker.position.set(0, birthHeight, 0);
+            scene.add(birthMarker);
+
+            // Birth transition arrow
+            const arrowStart = new THREE.Vector3(0, birthHeight, 0);
+            const arrowEnd = new THREE.Vector3(3, birthHeight, 0);
+            const arrowDir = new THREE.Vector3().subVectors(arrowEnd, arrowStart).normalize();
+            const arrowLength = arrowStart.distanceTo(arrowEnd);
+            const arrowHelper = new THREE.ArrowHelper(arrowDir, arrowStart, arrowLength, 0x00ffaa, 0.5, 0.3);
+            scene.add(arrowHelper);
+
+            // Independent child after birth
+            const postBirthGeometry = new THREE.BoxGeometry(
+                PERSON_WIDTH,
+                postBirthDuration,
+                PERSON_DEPTH
+            );
+            const postBirthMaterial = new THREE.MeshPhongMaterial({
+                color: childColor,
+                transparent: true,
+                opacity: 0.9,
+                shininess: 40
+            });
+            const postBirthMesh = new THREE.Mesh(postBirthGeometry, postBirthMaterial);
+            postBirthMesh.position.set(3, birthHeight + postBirthDuration / 2, 0);
+            scene.add(postBirthMesh);
+
+            // Child's germline
+            const childGermlineGeometry = new THREE.BoxGeometry(
+                PERSON_WIDTH * 0.15,
+                postBirthDuration,
+                PERSON_DEPTH * 0.15
+            );
+            const childGermline = new THREE.Mesh(childGermlineGeometry, germlineMaterial.clone());
+            childGermline.position.copy(postBirthMesh.position);
+            scene.add(childGermline);
+
+            // Add text labels
+            addLabel('CONCEPTION', 0, conceptionHeight - 0.8, 0, 0xffffff, 1.5);
+            addLabel('1st TRIMESTER', -3.5, gestationDuration * (6.5/40), 0, 0xff6b6b, 1);
+            addLabel('2nd TRIMESTER', -3.5, gestationDuration * (20/40), 0, 0xffa500, 1);
+            addLabel('3rd TRIMESTER', -3.5, gestationDuration * (33.5/40), 0, 0x4CAF50, 1);
+            addLabel('BIRTH', 1.5, birthHeight + 1, 0, 0x00ffaa, 1.5);
+            addLabel('INDEPENDENT LIFE', 3, birthHeight + postBirthDuration + 0.8, 0, childColor, 1);
+            addLabel(motherName, -4.5, birthHeight / 2, 0, 0xff69b4, 1.2);
+            addLabel(childName, 3, birthHeight + postBirthDuration / 2, 2, childColor, 1.2);
+
+            // Add timeline axis with week markers
+            const axisGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-5, conceptionHeight, 0),
+                new THREE.Vector3(-5, birthHeight + postBirthDuration, 0)
+            ]);
+            const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+            const axis = new THREE.Line(axisGeometry, axisMaterial);
+            scene.add(axis);
+
+            // Add week markers every 4 weeks
+            for (let week = 0; week <= 40; week += 4) {
+                const yPos = conceptionHeight + (week / 40) * gestationDuration;
+                addLabel(`${week}w`, -5.8, yPos, 0, 0xaaaaaa, 0.6);
+                
+                // Add tick mark
+                const tickGeometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(-5, yPos, 0),
+                    new THREE.Vector3(-4.7, yPos, 0)
+                ]);
+                const tick = new THREE.Line(tickGeometry, axisMaterial);
+                scene.add(tick);
+            }
+            
+            // Update camera to view the stretched timeline
+            camera.position.set(8, birthHeight / 2, 12);
+            camera.lookAt(0, birthHeight / 2, 0);
+            controls.target.set(0, birthHeight / 2, 0);
+        }
+
+        function addLabel(text, x, y, z, color, scale = 1) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 128;
+            
+            context.fillStyle = '#' + color.toString(16).padStart(6, '0');
+            context.font = 'Bold 48px Arial';
+            context.textAlign = 'center';
+            context.fillText(text, 256, 80);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.position.set(x, y, z);
+            sprite.scale.set(3 * scale, 0.75 * scale, 1);
+            scene.add(sprite);
+        }
+        
+        function addTrimesterMarker(height, label, color) {
+            // Horizontal line across mother's width
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-1.5, height, 0),
+                new THREE.Vector3(1.5, height, 0)
+            ]);
+            const lineMaterial = new THREE.LineBasicMaterial({ 
+                color: color, 
+                linewidth: 3,
+                transparent: true,
+                opacity: 0.8
+            });
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            scene.add(line);
+            
+            // Label
+            addLabel(label, 3.5, height, 0, color, 0.7);
+        }
+        
+        function addMilestoneMarker(height, label, xOffset) {
+            // Small sphere marker
+            const markerGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+            const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+            marker.position.set(xOffset, height, 0);
+            scene.add(marker);
+            
+            // Line from marker to label
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, height, 0),
+                new THREE.Vector3(xOffset, height, 0)
+            ]);
+            const lineMaterial = new THREE.LineBasicMaterial({ 
+                color: 0xffff00,
+                transparent: true,
+                opacity: 0.5
+            });
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            scene.add(line);
+            
+            // Label
+            addLabel(label, xOffset, height, 0.5, 0xffff00, 0.5);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize
+        init();
+        animate();
+    </script>
+</body>
+</html>
