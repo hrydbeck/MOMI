@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mount Improbable - MOMI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            overflow: hidden;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+        }
+
+        #canvas-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #1e3c72;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #2a5298;
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 20px;
+            border: 1px solid #333;
+        }
+
+        .legend-box.female {
+            background: #ff69b4;
+            border-radius: 5px;
+        }
+
+        .legend-box.male {
+            background: #4169e1;
+        }
+
+        .person-info {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .person-info h3 {
+            color: #1e3c72;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .person-info p {
+            margin: 3px 0;
+        }
+
+        button {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #1e3c72;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 10px;
+        }
+
+        #title-overlay {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="canvas-container">
+            <div id="title-overlay">Mount Improbable</div>
+            <div id="loading">Loading 3D Visualization...</div>
+        </div>
+        <div id="controls">
+            <h1>MOMI</h1>
+            <p style="color: #666; font-size: 12px; margin-bottom: 15px;">
+                Motives of Mount Improbable
+            </p>
+
+            <div class="info">
+                <strong>3D Family Tree - Mount Improbable</strong><br>
+                Y-axis: Time (↑ top = present, bottom = past)<br>
+                X & Z axes: Family positioning<br>
+                Height: Lifespan/Age<br>
+                <em>Family tree grows upward through time</em>
+            </div>
+
+            <h2>Legend</h2>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box female"></div>
+                    <span>Female (rounded rectangle)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box male"></div>
+                    <span>Male (rectangle)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #888888;"></div>
+                    <span>Deceased (grey, transparent)</span>
+                </div>
+            </div>
+
+            <h2>Controls</h2>
+            <div class="info">
+                <strong>Mouse:</strong><br>
+                • Left click + drag: Rotate view<br>
+                • Right click + drag: Pan<br>
+                • Scroll: Zoom in/out<br>
+                • Click on person: View details
+            </div>
+
+            <button id="reset-camera">Reset Camera View</button>
+
+            <h2>Family Selection</h2>
+            <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;">
+                <button id="select-all" style="background: #4CAF50;">Show All Families</button>
+                <button id="select-smith">Focus Smith Family</button>
+                <button id="select-chen">Focus Chen Family</button>
+            </div>
+
+            <div id="family-info"></div>
+            <div id="person-details"></div>
+
+            <h2>Families</h2>
+            <div class="info">
+                <strong>2 Families, 3 Generations Each:</strong><br>
+                • Smith Family (left, 9 members)<br>
+                • Chen Family (right, 8 members)<br>
+                • Shows evolutionary progression<br>
+                • All births biologically spaced (9+ months)<br>
+                <em>Click buttons to focus, or click gestation stacks for trimester info</em>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+
+        // Configuration
+        const PERSON_WIDTH = 1;
+        const PERSON_DEPTH = 1;
+        const YEAR_SCALE = 0.1; // 1 year = 0.1 units in 3D space
+        const CURRENT_YEAR = 2025;
+        const OLDEST_YEAR = 1930; // Reference point for the bottom of the timeline
+
+        // Scene setup
+        let scene, camera, renderer, controls;
+        let selectedPerson = null;
+        let selectedFamily = null; // 'smith', 'chen', or null for all
+        const personMeshes = new Map(); // Map person ID to mesh
+        const conceptionLines = []; // Store conception line objects
+        
+        // Family member IDs
+        const familyMembers = {
+            smith: ['gf1', 'gm1', 'gf2', 'gm2', 'f1', 'm1', 'c1', 'c2', 'c3'],
+            chen: ['gf3', 'gm3', 'gf4', 'gm4', 'f2', 'm2', 'c4', 'c5']
+        };
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a2332);
+            scene.fog = new THREE.Fog(0x1a2332, 10, 50);
+
+            // Camera
+            const container = document.getElementById('canvas-container');
+            camera = new THREE.PerspectiveCamera(
+                60,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(15, 10, 15);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 5;
+            controls.maxDistance = 50;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 20, 10);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.camera.left = -20;
+            directionalLight.shadow.camera.right = 20;
+            directionalLight.shadow.camera.top = 20;
+            directionalLight.shadow.camera.bottom = -20;
+            scene.add(directionalLight);
+
+            // Grid helper at bottom (past)
+            const gridHelper = new THREE.GridHelper(30, 30, 0x444444, 0x222222);
+            gridHelper.position.y = 0;
+            scene.add(gridHelper);
+
+            // Add grid at present (top)
+            addPresentGrid();
+
+            // Axes helper
+            const axesHelper = new THREE.AxesHelper(5);
+            scene.add(axesHelper);
+
+            // Add axis labels
+            addAxisLabels();
+            
+            // Add visible Y-axis with year markings
+            addTimeAxis();
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Mouse click for selection
+            renderer.domElement.addEventListener('click', onMouseClick);
+
+            // Reset camera button
+            document.getElementById('reset-camera').addEventListener('click', resetCamera);
+            
+            // Family selection buttons
+            document.getElementById('select-all').addEventListener('click', () => selectFamily(null));
+            document.getElementById('select-smith').addEventListener('click', () => selectFamily('smith'));
+            document.getElementById('select-chen').addEventListener('click', () => selectFamily('chen'));
+
+            // Hide loading message
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function addAxisLabels() {
+            const loader = new THREE.FontLoader();
+            // For simplicity, using sprites with text textures
+            const createTextLabel = (text, position, color = 0xffffff) => {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = 256;
+                canvas.height = 128;
+                context.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+                context.font = 'Bold 48px Arial';
+                context.textAlign = 'center';
+                context.fillText(text, 128, 80);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.position.copy(position);
+                sprite.scale.set(2, 1, 1);
+                scene.add(sprite);
+            };
+
+            createTextLabel('Time (Y) ↑', new THREE.Vector3(0, 12, 0), 0x00ff00);
+            createTextLabel('X', new THREE.Vector3(6, 0, 0), 0xff0000);
+            createTextLabel('Z', new THREE.Vector3(0, 0, 6), 0x0000ff);
+        }
+
+        function addPresentGrid() {
+            // Calculate height of present (2025)
+            const presentHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            
+            // Create a semi-transparent grid at the present level
+            const gridHelper = new THREE.GridHelper(30, 30, 0x00ff88, 0x00aa66);
+            gridHelper.position.y = presentHeight;
+            scene.add(gridHelper);
+            
+            // Add a glowing plane to make it more visible
+            const planeGeometry = new THREE.PlaneGeometry(30, 30);
+            const planeMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffaa,
+                transparent: true,
+                opacity: 0.1,
+                side: THREE.DoubleSide
+            });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.rotation.x = Math.PI / 2;
+            plane.position.y = presentHeight;
+            scene.add(plane);
+            
+            // Add a border/outline for the present plane
+            const edgesGeometry = new THREE.EdgesGeometry(planeGeometry);
+            const edgesMaterial = new THREE.LineBasicMaterial({ 
+                color: 0x00ffff,
+                linewidth: 2
+            });
+            const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+            edges.rotation.x = Math.PI / 2;
+            edges.position.y = presentHeight;
+            scene.add(edges);
+            
+            // Add "BIOSPHERE, NOW" label
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 128;
+            context.fillStyle = '#00ffff';
+            context.font = 'Bold 48px Arial';
+            context.textAlign = 'center';
+            context.fillText('BIOSPHERE, NOW', 256, 80);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.position.set(0, presentHeight + 0.5, 0);
+            sprite.scale.set(6, 1.5, 1);
+            scene.add(sprite);
+        }
+
+        function addTimeAxis() {
+            // Create vertical axis line - bottom (past) to top (present)
+            const maxHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            const axisPoints = [
+                new THREE.Vector3(-6, 0, -6),
+                new THREE.Vector3(-6, maxHeight, -6)
+            ];
+            const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisPoints);
+            const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+            const axisLine = new THREE.Line(axisGeometry, axisMaterial);
+            scene.add(axisLine);
+
+            // Add year labels every 10 years
+            const createYearLabel = (year, yPosition) => {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = 128;
+                canvas.height = 64;
+                context.fillStyle = '#ffffff';
+                context.font = 'Bold 32px Arial';
+                context.textAlign = 'right';
+                context.fillText(year.toString(), 120, 45);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.position.set(-7, yPosition, -6);
+                sprite.scale.set(1.5, 0.75, 1);
+                scene.add(sprite);
+                
+                // Add tick mark
+                const tickPoints = [
+                    new THREE.Vector3(-6, yPosition, -6),
+                    new THREE.Vector3(-6.3, yPosition, -6)
+                ];
+                const tickGeometry = new THREE.BufferGeometry().setFromPoints(tickPoints);
+                const tickMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+                const tick = new THREE.Line(tickGeometry, tickMaterial);
+                scene.add(tick);
+            };
+
+            // Calculate year range
+            const yearsToShow = [1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020, CURRENT_YEAR];
+            
+            yearsToShow.forEach(year => {
+                const yPosition = (year - OLDEST_YEAR) * YEAR_SCALE;
+                createYearLabel(year, yPosition);
+            });
+        }
+
+        function createRoundedBoxGeometry(width, height, depth, radius, smoothness) {
+            // Create a shape for rounded rectangle (viewed from above)
+            const shape = new THREE.Shape();
+            const x = -width / 2;
+            const y = -depth / 2;
+            const w = width;
+            const h = depth;
+            const r = radius;
+            
+            shape.moveTo(x + r, y);
+            shape.lineTo(x + w - r, y);
+            shape.quadraticCurveTo(x + w, y, x + w, y + r);
+            shape.lineTo(x + w, y + h - r);
+            shape.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            shape.lineTo(x + r, y + h);
+            shape.quadraticCurveTo(x, y + h, x, y + h - r);
+            shape.lineTo(x, y + r);
+            shape.quadraticCurveTo(x, y, x + r, y);
+            
+            const extrudeSettings = {
+                depth: height,
+                bevelEnabled: false
+            };
+            
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            geometry.rotateX(Math.PI / 2);
+            geometry.translate(0, height / 2, 0);
+            
+            return geometry;
+        }
+
+        function createPerson(data) {
+            const { id, name, sex, birthYear, birthMonth = 6, deathYear, x, z, motherId } = data;
+            
+            // Calculate Y position and height (including months for precision)
+            // Present is at TOP (high Y), past at BOTTOM (low Y) - building Mount Improbable upward
+            const birthDecimal = birthYear + (birthMonth - 1) / 12;
+            const conceptionDecimal = birthDecimal - (9/12); // 9 months before birth
+            const currentAge = deathYear ? 
+                (deathYear - birthDecimal) : 
+                (CURRENT_YEAR + 11/12 - birthDecimal); // Current month assumed as Dec
+            const height = currentAge * YEAR_SCALE;
+            const birthHeight = (birthDecimal - OLDEST_YEAR) * YEAR_SCALE; // Birth position from bottom
+            const yPosition = birthHeight + height / 2; // Center of the box (birth + half height)
+
+            // Create geometry based on sex
+            let geometry;
+            if (sex === 'F') {
+                // Rounded box for females
+                geometry = createRoundedBoxGeometry(PERSON_WIDTH, height, PERSON_DEPTH, 0.15, 16);
+            } else {
+                // Regular box for males
+                geometry = new THREE.BoxGeometry(PERSON_WIDTH, height, PERSON_DEPTH);
+            }
+            
+            // Create material based on sex and living status
+            let color;
+            if (deathYear) {
+                // Deceased - grey color
+                color = 0x888888;
+            } else {
+                // Living - normal colors
+                color = sex === 'F' ? 0xff69b4 : 0x4169e1; // Pink for female, blue for male
+            }
+            
+            const material = new THREE.MeshPhongMaterial({ 
+                color: color,
+                shininess: 30,
+                transparent: true,
+                opacity: deathYear ? 0.6 : 0.9  // More transparent if deceased
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(x, yPosition, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+
+            if (sex === 'F' && !deathYear) {
+                // Add subtle emissive glow to living females
+                material.emissive = new THREE.Color(0xff1493);
+                material.emissiveIntensity = 0.1;
+            }
+
+            // Store reference to person data
+            mesh.userData = data;
+            mesh.userData.birthHeight = birthHeight;
+            mesh.userData.conceptionHeight = (conceptionDecimal - OLDEST_YEAR) * YEAR_SCALE;
+
+            personMeshes.set(id, mesh);
+            scene.add(mesh);
+
+            // Add gestation period visualization (9 months growing inside mother)
+            if (motherId) {
+                addGestationStack(data, mesh.userData.conceptionHeight, birthHeight, color);
+            }
+
+            // Add name label
+            addNameLabel(name, x, birthHeight + height / 2 + 0.5, z);
+
+            return mesh;
+        }
+
+        function addGestationStack(data, conceptionHeight, birthHeight, childColor) {
+            const { motherId, sex } = data;
+            
+            const mother = personMeshes.get(motherId);
+            if (!mother) return;
+            
+            const gestationHeight = birthHeight - conceptionHeight; // 9 months
+            
+            // Create a tapered geometry that grows from a point to full size
+            // We'll use multiple segments to create the growing effect
+            const segments = 10;
+            const segmentHeight = gestationHeight / segments;
+            
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments; // 0 to 1
+                const nextT = (i + 1) / segments;
+                
+                // Width and depth grow from 0 to full size
+                const widthBottom = PERSON_WIDTH * t;
+                const depthBottom = PERSON_DEPTH * t;
+                const widthTop = PERSON_WIDTH * nextT;
+                const depthTop = PERSON_DEPTH * nextT;
+                
+                // Create a frustum (tapered box) for this segment
+                const shape = new THREE.Shape();
+                const hw = widthTop / 2;
+                const hd = depthTop / 2;
+                
+                if (sex === 'F') {
+                    // Rounded for females
+                    const r = 0.15 * nextT;
+                    shape.moveTo(-hw + r, -hd);
+                    shape.lineTo(hw - r, -hd);
+                    shape.quadraticCurveTo(hw, -hd, hw, -hd + r);
+                    shape.lineTo(hw, hd - r);
+                    shape.quadraticCurveTo(hw, hd, hw - r, hd);
+                    shape.lineTo(-hw + r, hd);
+                    shape.quadraticCurveTo(-hw, hd, -hw, hd - r);
+                    shape.lineTo(-hw, -hd + r);
+                    shape.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
+                } else {
+                    // Rectangle for males
+                    shape.moveTo(-hw, -hd);
+                    shape.lineTo(hw, -hd);
+                    shape.lineTo(hw, hd);
+                    shape.lineTo(-hw, hd);
+                    shape.lineTo(-hw, -hd);
+                }
+                
+                const extrudeSettings = {
+                    depth: segmentHeight,
+                    bevelEnabled: false,
+                    steps: 1
+                };
+                
+                const segmentGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                segmentGeometry.rotateX(Math.PI / 2);
+                
+                const segmentMaterial = new THREE.MeshPhongMaterial({
+                    color: childColor,
+                    transparent: true,
+                    opacity: 0.5,
+                    shininess: 20
+                });
+                
+                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                segment.position.set(
+                    mother.position.x,
+                    conceptionHeight + i * segmentHeight + segmentHeight / 2,
+                    mother.position.z
+                );
+                
+                // Store detailed gestation info for click interaction
+                const weekStart = Math.floor((i / segments) * 40);
+                const weekEnd = Math.floor((nextT) * 40);
+                const trimester = weekStart < 13 ? 1 : weekStart < 27 ? 2 : 3;
+                
+                segment.userData = { 
+                    isGestation: true, 
+                    childId: data.id,
+                    childName: data.name,
+                    motherName: mother.userData.name,
+                    weekStart: weekStart,
+                    weekEnd: weekEnd,
+                    trimester: trimester,
+                    gestationSegment: i
+                };
+                conceptionLines.push(segment);
+                scene.add(segment);
+            }
+            
+            // Add birth transition line from mother position to child's position
+            const birthTransitionPoints = [
+                new THREE.Vector3(mother.position.x, birthHeight, mother.position.z),
+                new THREE.Vector3(data.x, birthHeight, data.z)
+            ];
+            
+            const birthLineGeometry = new THREE.BufferGeometry().setFromPoints(birthTransitionPoints);
+            const birthLineMaterial = new THREE.LineBasicMaterial({
+                color: 0x00ffaa,
+                transparent: true,
+                opacity: 0.6,
+                linewidth: 2
+            });
+            
+            const birthLine = new THREE.Line(birthLineGeometry, birthLineMaterial);
+            birthLine.userData = { isBirthTransition: true, childId: data.id };
+            conceptionLines.push(birthLine);
+            scene.add(birthLine);
+            
+            // Add arrow showing child "coming out" from mother to independent position
+            addArrow(
+                new THREE.Vector3(mother.position.x, birthHeight, mother.position.z),
+                new THREE.Vector3(data.x, birthHeight, data.z),
+                0x00ffaa
+            );
+            
+            // Add "birth event" marker
+            const birthMarkerGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+            const birthMarkerMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffaa,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const birthMarker = new THREE.Mesh(birthMarkerGeometry, birthMarkerMaterial);
+            birthMarker.position.set(mother.position.x, birthHeight, mother.position.z);
+            birthMarker.userData = { isBirthMarker: true, childId: data.id };
+            conceptionLines.push(birthMarker);
+            scene.add(birthMarker);
+        }
+
+        function addNameLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 256;
+            canvas.height = 64;
+            context.fillStyle = '#ffffff';
+            context.font = 'Bold 32px Arial';
+            context.textAlign = 'center';
+            context.fillText(text, 128, 40);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.position.set(x, y, z);
+            sprite.scale.set(1.5, 0.375, 1);
+            scene.add(sprite);
+        }
+
+        function createConceptionBar(fatherId, motherId, childId) {
+            const father = personMeshes.get(fatherId);
+            const mother = personMeshes.get(motherId);
+            const child = personMeshes.get(childId);
+
+            if (!father || !mother || !child) {
+                console.error('Missing person for conception bar');
+                return;
+            }
+
+            // Use CONCEPTION height (9 months before birth) not birth height
+            const conceptionHeight = child.userData.conceptionHeight;
+
+            // Create points for the connection at conception time (when sperm fertilizes egg)
+            const points = [];
+            
+            // Father's position at conception time
+            const fatherX = father.position.x;
+            const fatherZ = father.position.z;
+            points.push(new THREE.Vector3(fatherX, conceptionHeight, fatherZ));
+
+            // Mother's position at conception time (this is where the point/fertilized egg starts)
+            const motherX = mother.position.x;
+            const motherZ = mother.position.z;
+            points.push(new THREE.Vector3(motherX, conceptionHeight, motherZ));
+
+            // NOTE: We don't connect to child's position here because at conception,
+            // the child is just a point inside the mother
+
+            // Create the line geometry (just father to mother at conception)
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ 
+                color: 0xffff00,
+                linewidth: 3,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const line = new THREE.Line(geometry, material);
+            scene.add(line);
+            
+            // Store line with family info
+            line.userData = { fatherId, motherId, childId };
+            conceptionLines.push(line);
+
+            // Add arrow pointing from father to mother at conception to show direction of inheritance
+            addArrow(new THREE.Vector3(fatherX, conceptionHeight, fatherZ), 
+                     new THREE.Vector3(motherX, conceptionHeight, motherZ), 0xffff00);
+
+            // Add small spheres at connection points
+            const sphereGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+            const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            
+            points.forEach(point => {
+                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                sphere.position.copy(point);
+                sphere.userData = { fatherId, motherId, childId };
+                conceptionLines.push(sphere);
+                scene.add(sphere);
+            });
+        }
+
+        function addArrow(from, to, color) {
+            // Calculate direction and distance
+            const direction = new THREE.Vector3().subVectors(to, from);
+            const distance = direction.length();
+            direction.normalize();
+            
+            // Position arrow 70% of the way from parent to child
+            const arrowPosition = from.clone().add(direction.clone().multiplyScalar(distance * 0.7));
+            
+            // Create arrow using cone geometry
+            const arrowLength = 0.3;
+            const arrowRadius = 0.15;
+            const arrowGeometry = new THREE.ConeGeometry(arrowRadius, arrowLength, 8);
+            const arrowMaterial = new THREE.MeshBasicMaterial({ 
+                color: color,
+                transparent: true,
+                opacity: 0.8
+            });
+            const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+            
+            // Position and orient the arrow
+            arrow.position.copy(arrowPosition);
+            
+            // Point the arrow in the direction from parent to child
+            const axis = new THREE.Vector3(0, 1, 0);
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromUnitVectors(axis, direction);
+            arrow.quaternion.copy(quaternion);
+            
+            // Store for opacity control
+            arrow.userData = { isArrow: true };
+            conceptionLines.push(arrow);
+            
+            scene.add(arrow);
+        }
+
+        // Sample family data - 3 generations
+        // Note: Births respect biological constraints (minimum 9 months between siblings)
+        const familyData = [
+            // ===== FAMILY 1 - Smith Family (3 generations) =====
+            // Generation 1 - Grandparents (oldest first, z=-8, two generations back)
+            { id: 'gf1', name: 'John Sr.', sex: 'M', birthYear: 1940, birthMonth: 3, deathYear: 2015, x: -4, z: -8 },
+            { id: 'gm1', name: 'Mary', sex: 'F', birthYear: 1942, birthMonth: 7, deathYear: 2018, x: -2, z: -8 },
+            { id: 'gf2', name: 'Robert', sex: 'M', birthYear: 1938, birthMonth: 1, deathYear: 2010, x: 2, z: -8 },
+            { id: 'gm2', name: 'Patricia', sex: 'F', birthYear: 1941, birthMonth: 11, deathYear: null, x: 4, z: -8 },
+            
+            // Generation 2 - Parents (z=-4, one generation back)
+            { id: 'f1', name: 'John Jr.', sex: 'M', birthYear: 1965, birthMonth: 5, deathYear: null, x: -3, z: -4, motherId: 'gm1' },
+            { id: 'm1', name: 'Susan', sex: 'F', birthYear: 1968, birthMonth: 9, deathYear: null, x: 3, z: -4, motherId: 'gm2' },
+            
+            // Generation 3 - Children (youngest, z=0, closest to viewer)
+            { id: 'c1', name: 'Michael', sex: 'M', birthYear: 1995, birthMonth: 3, deathYear: null, x: -2, z: 0, motherId: 'm1' },
+            { id: 'c2', name: 'Emily', sex: 'F', birthYear: 1997, birthMonth: 2, deathYear: null, x: 0, z: 0, motherId: 'm1' },
+            { id: 'c3', name: 'Sarah', sex: 'F', birthYear: 1999, birthMonth: 6, deathYear: null, x: 2, z: 0, motherId: 'm1' },
+
+            // ===== FAMILY 2 - Chen Family (3 generations) =====
+            // Generation 1 - Grandparents (z=-8, two generations back)
+            { id: 'gf3', name: 'Wei', sex: 'M', birthYear: 1945, birthMonth: 8, deathYear: 2020, x: 8, z: -8 },
+            { id: 'gm3', name: 'Ling', sex: 'F', birthYear: 1947, birthMonth: 4, deathYear: null, x: 10, z: -8 },
+            { id: 'gf4', name: 'Tao', sex: 'M', birthYear: 1943, birthMonth: 12, deathYear: 2019, x: 14, z: -8 },
+            { id: 'gm4', name: 'Mei', sex: 'F', birthYear: 1946, birthMonth: 6, deathYear: null, x: 16, z: -8 },
+            
+            // Generation 2 - Parents (z=-4, one generation back)
+            { id: 'f2', name: 'David', sex: 'M', birthYear: 1970, birthMonth: 3, deathYear: null, x: 9, z: -4, motherId: 'gm3' },
+            { id: 'm2', name: 'Li', sex: 'F', birthYear: 1972, birthMonth: 10, deathYear: null, x: 15, z: -4, motherId: 'gm4' },
+            
+            // Generation 3 - Children (youngest, z=0, aligned with Smith's youngest)
+            { id: 'c4', name: 'Alex', sex: 'M', birthYear: 2000, birthMonth: 5, deathYear: null, x: 10, z: 0, motherId: 'm2' },
+            { id: 'c5', name: 'Maya', sex: 'F', birthYear: 2003, birthMonth: 1, deathYear: null, x: 12, z: 0, motherId: 'm2' },
+        ];
+
+        const conceptions = [
+            // ===== FAMILY 1 - Smith Family =====
+            // Father connects to parents
+            { father: 'gf1', mother: 'gm1', child: 'f1' },
+            // Mother connects to parents
+            { father: 'gf2', mother: 'gm2', child: 'm1' },
+            // Children connect to parents
+            { father: 'f1', mother: 'm1', child: 'c1' },
+            { father: 'f1', mother: 'm1', child: 'c2' },
+            { father: 'f1', mother: 'm1', child: 'c3' },
+            
+            // ===== FAMILY 2 - Chen Family =====
+            // Father connects to parents
+            { father: 'gf3', mother: 'gm3', child: 'f2' },
+            // Mother connects to parents
+            { father: 'gf4', mother: 'gm4', child: 'm2' },
+            // Children connect to parents
+            { father: 'f2', mother: 'm2', child: 'c4' },
+            { father: 'f2', mother: 'm2', child: 'c5' },
+        ];
+
+        function createFamily() {
+            // Create all people
+            familyData.forEach(person => createPerson(person));
+
+            // Create conception bars
+            conceptions.forEach(conception => {
+                createConceptionBar(conception.father, conception.mother, conception.child);
+            });
+        }
+
+        function onMouseClick(event) {
+            const container = document.getElementById('canvas-container');
+            const rect = container.getBoundingClientRect();
+            
+            const mouse = new THREE.Vector2();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check for gestation segments first
+            const allObjects = scene.children;
+            const gestationIntersects = raycaster.intersectObjects(allObjects.filter(obj => obj.userData.isGestation));
+            
+            if (gestationIntersects.length > 0) {
+                const gestationSegment = gestationIntersects[0].object;
+                displayGestationInfo(gestationSegment.userData);
+                return;
+            }
+            
+            // Then check for person meshes
+            const meshes = Array.from(personMeshes.values());
+            const intersects = raycaster.intersectObjects(meshes);
+
+            if (intersects.length > 0) {
+                const clickedMesh = intersects[0].object;
+                selectPerson(clickedMesh);
+            } else {
+                deselectPerson();
+            }
+        }
+
+        function selectPerson(mesh) {
+            // Deselect previous
+            if (selectedPerson) {
+                selectedPerson.material.emissive.setHex(
+                    selectedPerson.userData.sex === 'F' ? 0xff1493 : 0x000000
+                );
+                selectedPerson.material.emissiveIntensity = selectedPerson.userData.sex === 'F' ? 0.1 : 0;
+            }
+
+            // Select new
+            selectedPerson = mesh;
+            mesh.material.emissive.setHex(0xffff00);
+            mesh.material.emissiveIntensity = 0.3;
+
+            // Display info
+            displayPersonInfo(mesh.userData);
+        }
+
+        function deselectPerson() {
+            if (selectedPerson) {
+                selectedPerson.material.emissive.setHex(
+                    selectedPerson.userData.sex === 'F' ? 0xff1493 : 0x000000
+                );
+                selectedPerson.material.emissiveIntensity = selectedPerson.userData.sex === 'F' ? 0.1 : 0;
+                selectedPerson = null;
+            }
+            document.getElementById('person-details').innerHTML = '';
+        }
+        
+        function selectFamily(family) {
+            selectedFamily = family;
+            
+            // Update all person meshes
+            personMeshes.forEach((mesh, id) => {
+                const isSmith = familyMembers.smith.includes(id);
+                const isChen = familyMembers.chen.includes(id);
+                const isDeceased = mesh.userData.deathYear !== null && mesh.userData.deathYear !== undefined;
+                
+                if (family === null) {
+                    // Show all - restore colors based on living status
+                    if (isDeceased) {
+                        mesh.material.color.setHex(0x888888);
+                        mesh.material.opacity = 0.6;
+                    } else {
+                        mesh.material.color.setHex(mesh.userData.sex === 'F' ? 0xff69b4 : 0x4169e1);
+                        mesh.material.opacity = 0.9;
+                    }
+                } else if ((family === 'smith' && isSmith) || (family === 'chen' && isChen)) {
+                    // Selected family - show colors based on living status
+                    if (isDeceased) {
+                        mesh.material.color.setHex(0x888888);
+                        mesh.material.opacity = 0.6;
+                    } else {
+                        mesh.material.color.setHex(mesh.userData.sex === 'F' ? 0xff69b4 : 0x4169e1);
+                        mesh.material.opacity = 0.9;
+                    }
+                } else {
+                    // Non-selected family - grey and transparent
+                    mesh.material.opacity = 0.3;
+                    mesh.material.color.setHex(0x666666);
+                }
+            });
+            
+            // Update conception lines
+            conceptionLines.forEach(obj => {
+                const childId = obj.userData.childId;
+                const isSmith = familyMembers.smith.includes(childId);
+                const isChen = familyMembers.chen.includes(childId);
+                
+                if (family === null) {
+                    obj.material.opacity = 0.8;
+                } else if ((family === 'smith' && isSmith) || (family === 'chen' && isChen)) {
+                    obj.material.opacity = 0.8;
+                } else {
+                    obj.material.opacity = 0.2;
+                }
+            });
+            
+            // Display family info
+            displayFamilyInfo(family);
+        }
+        
+        function displayFamilyInfo(family) {
+            const infoDiv = document.getElementById('family-info');
+            
+            if (family === null) {
+                infoDiv.innerHTML = '';
+                return;
+            }
+            
+            const familyData = {
+                smith: {
+                    name: 'Smith Family',
+                    members: 9,
+                    generations: 3,
+                    oldest: 'Robert (1938)',
+                    youngest: 'Sarah (1999)',
+                    living: 6
+                },
+                chen: {
+                    name: 'Chen Family',
+                    members: 8,
+                    generations: 3,
+                    oldest: 'Tao (1943)',
+                    youngest: 'Maya (2003)',
+                    living: 6
+                }
+            };
+            
+            const info = familyData[family];
+            const html = `
+                <div class="person-info" style="background: #e3f2fd;">
+                    <h3>${info.name}</h3>
+                    <p><strong>Total Members:</strong> ${info.members}</p>
+                    <p><strong>Generations:</strong> ${info.generations}</p>
+                    <p><strong>Oldest:</strong> ${info.oldest}</p>
+                    <p><strong>Youngest:</strong> ${info.youngest}</p>
+                    <p><strong>Living:</strong> ${info.living}</p>
+                </div>
+            `;
+            
+            infoDiv.innerHTML = html;
+        }
+
+        function displayPersonInfo(data) {
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const birthDecimal = data.birthYear + ((data.birthMonth || 6) - 1) / 12;
+            const age = data.deathYear ? 
+                (data.deathYear - birthDecimal) : 
+                (CURRENT_YEAR + 11/12 - birthDecimal);
+            
+            const status = data.deathYear ? `Deceased (${data.deathYear})` : 'Living';
+            const birthDate = data.birthMonth ? 
+                `${monthNames[data.birthMonth - 1]} ${data.birthYear}` : 
+                data.birthYear;
+            
+            const html = `
+                <div class="person-info">
+                    <h3>${data.name}</h3>
+                    <p><strong>Sex:</strong> ${data.sex === 'M' ? 'Male' : 'Female'}</p>
+                    <p><strong>Birth:</strong> ${birthDate}</p>
+                    <p><strong>Age:</strong> ${age.toFixed(1)} years</p>
+                    <p><strong>Status:</strong> ${status}</p>
+                    <p><strong>Position:</strong> (${data.x.toFixed(1)}, ${data.z.toFixed(1)})</p>
+                </div>
+            `;
+            
+            document.getElementById('person-details').innerHTML = html;
+        }
+        
+        function displayGestationInfo(gestationData) {
+            const { childName, motherName, weekStart, weekEnd, trimester, gestationSegment } = gestationData;
+            
+            const trimesterInfo = {
+                1: { name: 'First Trimester', desc: 'Embryonic development, organ formation', weeks: '0-13' },
+                2: { name: 'Second Trimester', desc: 'Rapid growth, movement begins', weeks: '14-26' },
+                3: { name: 'Third Trimester', desc: 'Final development, preparing for birth', weeks: '27-40' }
+            };
+            
+            const info = trimesterInfo[trimester];
+            
+            const html = `
+                <div class="person-info" style="background: #e8f5e9;">
+                    <h3>Gestation Period</h3>
+                    <p><strong>Child:</strong> ${childName}</p>
+                    <p><strong>Mother:</strong> ${motherName}</p>
+                    <p><strong>Weeks:</strong> ${weekStart}-${weekEnd} of 40</p>
+                    <p><strong>${info.name}</strong></p>
+                    <p><em>${info.desc}</em></p>
+                    <p style="font-size: 11px; color: #666; margin-top: 8px;">
+                        ${info.weeks} weeks total
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('person-details').innerHTML = html;
+        }
+
+        function resetCamera() {
+            camera.position.set(15, 10, 15);
+            camera.lookAt(0, 0, 0);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize and start
+        try {
+            init();
+            createFamily();
+            animate();
+        } catch (error) {
+            console.error('Error initializing visualization:', error);
+            document.getElementById('loading').innerHTML = 'Error loading visualization. Check console for details.<br><br>' + error.message;
+            document.getElementById('loading').style.background = 'rgba(255, 0, 0, 0.7)';
+        }
+    </script>
+</body>
+</html>
