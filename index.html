@@ -227,6 +227,7 @@
             <button id="reset-camera">Reset Camera View</button>
             <button id="toggle-perspective" style="background: #ff6b35; margin-top: 5px;">Disable Perspective</button>
             <button id="toggle-life-events" style="background: #9c27b0; margin-top: 5px;">Hide Life Events</button>
+            <button id="toggle-genomes" style="background: #2196f3; margin-top: 5px;">Show Diploid Genomes</button>
 
             <h2>Family Selection</h2>
             <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;">
@@ -275,6 +276,8 @@
         const personMeshes = new Map(); // Map person ID to mesh
         const conceptionLines = []; // Store conception line objects
         const lifeEventMarkers = []; // Store life event markers and lines
+        const genomeVisualizations = []; // Store genome visualizations
+        let genomesVisible = false; // Toggle for genome visibility
         
         // Family member IDs (populated from API)
         let familyMembers = {};
@@ -381,6 +384,9 @@
             
             // Life events toggle button
             document.getElementById('toggle-life-events').addEventListener('click', toggleLifeEvents);
+            
+            // Genome toggle button
+            document.getElementById('toggle-genomes').addEventListener('click', toggleGenomes);
             
             // Family selection buttons
             document.getElementById('select-all').addEventListener('click', () => selectFamily(null));
@@ -781,8 +787,139 @@
             
             // Add life events markers
             addLifeEventsMarkers(id, x, z, birthDecimal, deathOrCurrentYear, birthHeight, height, centerPos, mesh.rotation);
+            
+            // Create genome visualization (hidden by default)
+            addDiploidGenomeVisualization(id, centerPos, height, sex, motherId, data.fatherId);
 
             return mesh;
+        }
+        
+        function addDiploidGenomeVisualization(personId, centerPos, personHeight, sex, motherId, fatherId) {
+            // Create a double helix visualization representing maternal and paternal chromosomes
+            const genomeGroup = new THREE.Group();
+            
+            // Position genome marker to the side of the person
+            const offsetX = 1.8;
+            const genomeHeight = Math.min(personHeight * 0.6, 3); // Cap height for visibility
+            const helixRadius = 0.15;
+            const turns = 3;
+            
+            // Create maternal chromosome strand (one color)
+            const maternalColor = 0xff6b9d; // Pink
+            const paternalColor = 0x4169e1; // Blue
+            
+            const segments = 60;
+            
+            // Maternal strand (left helix)
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments;
+                const angle = t * Math.PI * 2 * turns;
+                const y = t * genomeHeight - genomeHeight / 2;
+                const x = Math.cos(angle) * helixRadius;
+                const z = Math.sin(angle) * helixRadius;
+                
+                const sphereGeometry = new THREE.SphereGeometry(0.06, 8, 8);
+                const sphereMaterial = new THREE.MeshPhongMaterial({
+                    color: maternalColor,
+                    emissive: maternalColor,
+                    emissiveIntensity: 0.3
+                });
+                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                sphere.position.set(x - 0.1, y, z);
+                genomeGroup.add(sphere);
+            }
+            
+            // Paternal strand (right helix)
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments;
+                const angle = t * Math.PI * 2 * turns + Math.PI; // Offset by 180 degrees
+                const y = t * genomeHeight - genomeHeight / 2;
+                const x = Math.cos(angle) * helixRadius;
+                const z = Math.sin(angle) * helixRadius;
+                
+                const sphereGeometry = new THREE.SphereGeometry(0.06, 8, 8);
+                const sphereMaterial = new THREE.MeshPhongMaterial({
+                    color: paternalColor,
+                    emissive: paternalColor,
+                    emissiveIntensity: 0.3
+                });
+                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                sphere.position.set(x + 0.1, y, z);
+                genomeGroup.add(sphere);
+            }
+            
+            // Add connecting base pairs (rungs of the ladder)
+            for (let i = 0; i < 10; i++) {
+                const t = i / 10;
+                const angle1 = t * Math.PI * 2 * turns;
+                const angle2 = t * Math.PI * 2 * turns + Math.PI;
+                const y = t * genomeHeight - genomeHeight / 2;
+                
+                const x1 = Math.cos(angle1) * helixRadius - 0.1;
+                const z1 = Math.sin(angle1) * helixRadius;
+                const x2 = Math.cos(angle2) * helixRadius + 0.1;
+                const z2 = Math.sin(angle2) * helixRadius;
+                
+                const points = [
+                    new THREE.Vector3(x1, y, z1),
+                    new THREE.Vector3(x2, y, z2)
+                ];
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                const lineMaterial = new THREE.LineBasicMaterial({
+                    color: 0xcccccc,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                genomeGroup.add(line);
+            }
+            
+            // Add label
+            const labelCanvas = document.createElement('canvas');
+            labelCanvas.width = 256;
+            labelCanvas.height = 128;
+            const ctx = labelCanvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            
+            let labelText = 'Diploid Genome';
+            if (motherId && fatherId) {
+                labelText = '♀ + ♂ = 2n';
+            }
+            ctx.fillText(labelText, 128, 50);
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#ff6b9d';
+            ctx.fillText('Maternal', 64, 80);
+            ctx.fillStyle = '#4169e1';
+            ctx.fillText('Paternal', 192, 80);
+            
+            const labelTexture = new THREE.CanvasTexture(labelCanvas);
+            const labelMaterial = new THREE.SpriteMaterial({ 
+                map: labelTexture,
+                transparent: true,
+                opacity: 0.9
+            });
+            const labelSprite = new THREE.Sprite(labelMaterial);
+            labelSprite.scale.set(2, 1, 1);
+            labelSprite.position.set(0, genomeHeight / 2 + 0.8, 0);
+            genomeGroup.add(labelSprite);
+            
+            // Position the genome group
+            genomeGroup.position.set(
+                centerPos.x + offsetX,
+                centerPos.y,
+                centerPos.z
+            );
+            
+            genomeGroup.visible = genomesVisible;
+            genomeGroup.userData = {
+                isGenome: true,
+                personId: personId
+            };
+            
+            scene.add(genomeGroup);
+            genomeVisualizations.push(genomeGroup);
         }
         
         function addLifeEventsMarkers(personId, x, z, birthDecimal, topYear, birthHeight, personHeight, centerPos, rotation) {
@@ -1906,6 +2043,7 @@
             personMeshes.clear();
             conceptionLines.length = 0;
             lifeEventMarkers.length = 0;
+            genomeVisualizations.length = 0;
             
             // Recreate everything
             createFamily();
@@ -1922,6 +2060,20 @@
             // Toggle visibility of all life event markers
             lifeEventMarkers.forEach(marker => {
                 marker.visible = lifeEventsVisible;
+            });
+        }
+        
+        function toggleGenomes() {
+            genomesVisible = !genomesVisible;
+            
+            // Update button text
+            const button = document.getElementById('toggle-genomes');
+            button.textContent = genomesVisible ? 'Hide Diploid Genomes' : 'Show Diploid Genomes';
+            button.style.background = genomesVisible ? '#2196f3' : '#4CAF50';
+            
+            // Toggle visibility of all genome visualizations
+            genomeVisualizations.forEach(genome => {
+                genome.visible = genomesVisible;
             });
         }
         
