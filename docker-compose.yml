@@ -12,9 +12,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: momi_password
       MONGO_INITDB_DATABASE: momi_db
     volumes:
-      # Store data on the E: drive to save space on Linux filesystem
-      - /mnt/e/MOMI_large_files/mongodb_data:/data/db
-      - /mnt/e/MOMI_large_files/mongodb_config:/data/configdb
+      # Using Docker named volumes instead of Windows mount (permission issues)
+      - momi_mongodb_data:/data/db
+      - momi_mongodb_config:/data/configdb
     networks:
       - momi_network
 
@@ -38,3 +38,7 @@ services:
 networks:
   momi_network:
     driver: bridge
+
+volumes:
+  momi_mongodb_data:
+  momi_mongodb_config:

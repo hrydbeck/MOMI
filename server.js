@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = 3001; // Changed from 3000 (in use)
 
 // MongoDB connection
 const url = 'mongodb://momi_user:momi_password@localhost:27019';
