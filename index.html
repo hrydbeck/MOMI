@@ -2095,6 +2095,10 @@
             conceptionLines.length = 0;
             lifeEventMarkers.length = 0;
             genomeVisualizations.length = 0;
+            if (genomeLegend) {
+                scene.remove(genomeLegend);
+                genomeLegend = null;
+            }
             
             // Recreate everything
             createFamily();
