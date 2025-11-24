@@ -190,6 +190,7 @@
             </div>
 
             <button id="reset-camera">Reset Camera View</button>
+            <button id="toggle-perspective" style="background: #ff6b35; margin-top: 5px;">Disable Perspective</button>
 
             <h2>Family Selection</h2>
             <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;">
@@ -228,6 +229,7 @@
         // Evolutionary perspective - fictional origin point for visualization
         const ORIGIN_YEAR = OLDEST_YEAR - 20; // 20 years before oldest person (1910)
         const VANISHING_POINT = { x: 0, z: 0 }; // All lineages converge here
+        let perspectiveEnabled = true; // Toggle for perspective view
 
         // Scene setup
         let scene, camera, renderer, controls;
@@ -242,6 +244,11 @@
         // Apply perspective convergence to X/Z positions
         // Linear interpolation: at CURRENT_YEAR = full position, at ORIGIN_YEAR = vanishing point
         function applyPerspective(x, z, year) {
+            if (!perspectiveEnabled) {
+                // No perspective - return original positions
+                return { x: x, z: z, scale: 1.0 };
+            }
+            
             // Calculate how far we are from origin to present
             const totalYears = CURRENT_YEAR - ORIGIN_YEAR;
             const yearFromOrigin = year - ORIGIN_YEAR;
@@ -326,6 +333,9 @@
 
             // Reset camera button
             document.getElementById('reset-camera').addEventListener('click', resetCamera);
+            
+            // Perspective toggle button
+            document.getElementById('toggle-perspective').addEventListener('click', togglePerspective);
             
             // Family selection buttons
             document.getElementById('select-all').addEventListener('click', () => selectFamily(null));
@@ -618,7 +628,7 @@
             const verticalDist = Math.abs(originHeight - yPosition);
             
             // Tilt angles to make stack point toward origin
-            const tiltAmount = Math.atan2(horizontalDist, verticalDist);
+            const tiltAmount = perspectiveEnabled ? Math.atan2(horizontalDist, verticalDist) : 0;
             const tiltFactor = 0.6; // Increased for more visible effect
             
             // Calculate direction-based tilts (inverted to point toward, not away)
@@ -776,7 +786,7 @@
                     (segmentCenterPos.z - VANISHING_POINT.z) ** 2
                 );
                 const verticalDist = Math.abs(originHeight - segmentCenterY);
-                const tiltAmount = Math.atan2(horizontalDist, verticalDist);
+                const tiltAmount = perspectiveEnabled ? Math.atan2(horizontalDist, verticalDist) : 0;
                 const tiltFactor = 0.6;
                 
                 const xTilt = tiltAmount * tiltFactor * (segmentCenterPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
@@ -1589,6 +1599,37 @@
             camera.lookAt(0, 0, 0);
             controls.target.set(0, 0, 0);
             controls.update();
+        }
+        
+        function togglePerspective() {
+            // Toggle the perspective state
+            perspectiveEnabled = !perspectiveEnabled;
+            
+            // Update button text
+            const button = document.getElementById('toggle-perspective');
+            button.textContent = perspectiveEnabled ? 'Disable Perspective' : 'Enable Perspective';
+            button.style.background = perspectiveEnabled ? '#ff6b35' : '#4CAF50';
+            
+            // Clear the scene (keep camera, lights, and controls)
+            while(scene.children.length > 0) { 
+                scene.remove(scene.children[0]); 
+            }
+            
+            // Re-add lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 20, 10);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            // Clear stored data
+            personMeshes.clear();
+            conceptionLines.length = 0;
+            
+            // Recreate everything
+            createFamily();
         }
 
         function onWindowResize() {
