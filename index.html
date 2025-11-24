@@ -139,15 +139,26 @@
             font-size: 36px;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            pointer-events: none;
             z-index: 10;
+        }
+        
+        #title-overlay a {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        #title-overlay a:hover {
+            color: #00ffaa;
+            text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
         }
     </style>
 </head>
 <body>
     <div id="container">
         <div id="canvas-container">
-            <div id="title-overlay">Mount Improbable</div>
+            <div id="title-overlay"><a href="https://en.wikipedia.org/wiki/Climbing_Mount_Improbable" target="_blank">Mount Improbable</a></div>
             <div id="loading">Loading 3D Visualization...</div>
         </div>
         <div id="controls">
