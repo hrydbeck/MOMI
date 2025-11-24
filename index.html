@@ -621,9 +621,9 @@
             const tiltAmount = Math.atan2(horizontalDist, verticalDist);
             const tiltFactor = 0.6; // Increased for more visible effect
             
-            // Calculate direction-based tilts
-            const xTilt = -tiltAmount * tiltFactor * (centerPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
-            const zTilt = tiltAmount * tiltFactor * (centerPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
+            // Calculate direction-based tilts (inverted to point toward, not away)
+            const xTilt = tiltAmount * tiltFactor * (centerPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
+            const zTilt = -tiltAmount * tiltFactor * (centerPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
             
             // Apply position and rotation
             mesh.position.set(centerPos.x, centerPos.y, centerPos.z);
@@ -779,8 +779,8 @@
                 const tiltAmount = Math.atan2(horizontalDist, verticalDist);
                 const tiltFactor = 0.6;
                 
-                const xTilt = -tiltAmount * tiltFactor * (segmentCenterPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
-                const zTilt = tiltAmount * tiltFactor * (segmentCenterPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
+                const xTilt = tiltAmount * tiltFactor * (segmentCenterPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
+                const zTilt = -tiltAmount * tiltFactor * (segmentCenterPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
                 
                 segment.position.copy(segmentCenterPos);
                 segment.rotation.x = xTilt;
