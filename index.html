@@ -1098,29 +1098,29 @@
                 scene.add(line);
             });
             
-            // Add a prominent marker at the origin point
-            const originGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+            // Add a prominent marker at the origin point (small because it's far away)
+            const originGeometry = new THREE.SphereGeometry(0.3, 32, 32);
             const originMaterial = new THREE.MeshPhongMaterial({ 
                 color: 0xffaa00,
                 emissive: 0xffaa00,
-                emissiveIntensity: 0.8,
+                emissiveIntensity: 1.2,
                 transparent: true,
-                opacity: 0.9
+                opacity: 1.0
             });
             const originMarker = new THREE.Mesh(originGeometry, originMaterial);
             originMarker.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
             scene.add(originMarker);
             
-            // Add pulsing point light at origin
-            const originLight = new THREE.PointLight(0xffaa00, 2, 10);
+            // Add pulsing point light at origin (small but intense)
+            const originLight = new THREE.PointLight(0xffaa00, 3, 8);
             originLight.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
             scene.add(originLight);
             
-            // Animate the light to pulse
+            // Animate the light to pulse (more dramatic for distant point)
             const originLightData = { light: originLight, phase: 0 };
             function animateOriginLight() {
-                originLightData.phase += 0.05;
-                originLightData.light.intensity = 1.5 + Math.sin(originLightData.phase) * 0.5;
+                originLightData.phase += 0.08;
+                originLightData.light.intensity = 2 + Math.sin(originLightData.phase) * 1.5;
                 requestAnimationFrame(animateOriginLight);
             }
             animateOriginLight();
