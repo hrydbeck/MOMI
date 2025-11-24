@@ -255,6 +255,7 @@
             <button id="toggle-perspective" style="background: #ff6b35; margin-top: 5px;">Disable Perspective</button>
             <button id="toggle-life-events" style="background: #9c27b0; margin-top: 5px;">Hide Life Events</button>
             <button id="toggle-genomes" style="background: #2196f3; margin-top: 5px;">Show Diploid Genomes</button>
+            <button id="toggle-environment" style="background: #8bc34a; margin-top: 5px;">Show Environment View</button>
 
             <h2>Family Selection</h2>
             <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;">
@@ -306,6 +307,7 @@
         const genomeVisualizations = []; // Store genome visualizations
         let genomesVisible = false; // Toggle for genome visibility
         let genomeLegend = null; // Store reference to genome legend sprite
+        let environmentView = false; // Toggle for environment vs individual view
         
         // Family member IDs (populated from API)
         let familyMembers = {};
@@ -2181,6 +2183,25 @@
             genomeVisualizations.forEach(genome => {
                 genome.visible = genomesVisible;
             });
+        }
+        
+        function toggleEnvironment() {
+            environmentView = !environmentView;
+            
+            // Update button text
+            const button = document.getElementById('toggle-environment');
+            button.textContent = environmentView ? 'Show Individual View' : 'Show Environment View';
+            button.style.background = environmentView ? '#8bc34a' : '#4CAF50';
+            
+            // Clear scene and rebuild
+            clearScene();
+            createFamily();
+            
+            // Restore genome legend if needed
+            if (genomesVisible) {
+                const legendOverlay = document.getElementById('genome-legend');
+                legendOverlay.style.display = 'block';
+            }
         }
         
         let tooltip = null;
