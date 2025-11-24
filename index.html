@@ -1116,36 +1116,7 @@
             const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
             const presentHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
             
-            // 1. MOUNTAIN BASE - Rocky terrain at the origin (bottom of the mountain)
-            const baseGeometry = new THREE.ConeGeometry(12, 3, 32, 1, true);
-            const baseMaterial = new THREE.MeshPhongMaterial({
-                color: 0x4a3728,
-                emissive: 0x2a1a10,
-                emissiveIntensity: 0.3,
-                transparent: true,
-                opacity: 0.6,
-                side: THREE.DoubleSide
-            });
-            const mountainBase = new THREE.Mesh(baseGeometry, baseMaterial);
-            mountainBase.position.set(VANISHING_POINT.x, originHeight - 1.5, VANISHING_POINT.z);
-            mountainBase.rotation.y = Math.PI / 4;
-            scene.add(mountainBase);
-            
-            // Add rocky texture rings at base
-            for (let i = 0; i < 3; i++) {
-                const ringGeometry = new THREE.TorusGeometry(10 - i * 2.5, 0.2, 8, 32);
-                const ringMaterial = new THREE.MeshPhongMaterial({
-                    color: 0x5a4738,
-                    transparent: true,
-                    opacity: 0.4
-                });
-                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-                ring.position.set(VANISHING_POINT.x, originHeight - 0.5 + i * 0.3, VANISHING_POINT.z);
-                ring.rotation.x = Math.PI / 2;
-                scene.add(ring);
-            }
-            
-            // 2. ELEVATION CONTOURS - Rings showing climbing progress up the mountain
+            // ELEVATION CONTOURS - Rings showing climbing progress up the mountain
             const totalHeight = presentHeight - originHeight;
             const numContours = 8;
             
@@ -1192,43 +1163,6 @@
                     scene.add(marker);
                 }
             }
-            
-            // 3. MOUNTAIN PEAK - Summit indicator at NOW (present)
-            const peakGeometry = new THREE.ConeGeometry(4, 2, 4);
-            const peakMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                emissive: 0xaaffff,
-                emissiveIntensity: 0.8,
-                transparent: true,
-                opacity: 0.7
-            });
-            const peak = new THREE.Mesh(peakGeometry, peakMaterial);
-            peak.position.set(VANISHING_POINT.x, presentHeight + 0.5, VANISHING_POINT.z);
-            peak.rotation.y = Math.PI / 4;
-            scene.add(peak);
-            
-            // Peak flag/marker
-            const flagCanvas = document.createElement('canvas');
-            flagCanvas.width = 512;
-            flagCanvas.height = 128;
-            const flagCtx = flagCanvas.getContext('2d');
-            flagCtx.shadowColor = '#00ffff';
-            flagCtx.shadowBlur = 15;
-            flagCtx.fillStyle = '#00ffff';
-            flagCtx.font = 'bold 48px Arial';
-            flagCtx.textAlign = 'center';
-            flagCtx.fillText('🏔️ SUMMIT: NOW 🏔️', 256, 70);
-            
-            const flagTexture = new THREE.CanvasTexture(flagCanvas);
-            const flagMaterial = new THREE.SpriteMaterial({ 
-                map: flagTexture,
-                transparent: true,
-                opacity: 0.9
-            });
-            const flag = new THREE.Sprite(flagMaterial);
-            flag.position.set(VANISHING_POINT.x, presentHeight + 1.5, VANISHING_POINT.z);
-            flag.scale.set(6, 1.5, 1);
-            scene.add(flag);
             
             // Original perspective guide elements (converging lines)
             const guidePositions = [
