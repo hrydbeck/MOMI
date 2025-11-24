@@ -823,7 +823,18 @@
                 scene.add(marker);
                 
                 // Add connecting line from marker to person stack
-                const linePoints = [\n                    new THREE.Vector3(centerPos.x, eventHeight, centerPos.z),\n                    new THREE.Vector3(eventPerspective.x + offsetDistance, eventHeight, eventPerspective.z)\n                ];\n                const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);\n                const lineMaterial = new THREE.LineBasicMaterial({\n                    color: markerColor,\n                    transparent: true,\n                    opacity: 0.5\n                });\n                const line = new THREE.Line(lineGeometry, lineMaterial);\n                scene.add(line);
+                const linePoints = [
+                    new THREE.Vector3(centerPos.x, eventHeight, centerPos.z),
+                    new THREE.Vector3(eventPerspective.x + offsetDistance, eventHeight, eventPerspective.z)
+                ];
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+                const lineMaterial = new THREE.LineBasicMaterial({
+                    color: markerColor,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                scene.add(line);
             });
         }
 
