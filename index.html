@@ -679,9 +679,9 @@
             
             // Store germline position for conception connections
             mesh.userData.germlinePosition = { 
-                x: birthPerspective.x, 
-                y: yPosition, 
-                z: birthPerspective.z 
+                x: centerPos.x, 
+                y: centerPos.y, 
+                z: centerPos.z 
             };
 
             // Add gestation period visualization (9 months growing inside mother)
@@ -689,8 +689,8 @@
                 addGestationStack(data, mesh.userData.conceptionHeight, birthHeight, color, birthPerspective);
             }
 
-            // Add name label (use original x, z for now)
-            addNameLabel(name, birthPerspective.x, birthHeight + height / 2 + 0.5, birthPerspective.z);
+            // Add name label at the center of the stack
+            addNameLabel(name, centerPos.x, centerPos.y + height / 2 + 0.5, centerPos.z);
 
             return mesh;
         }
@@ -798,10 +798,18 @@
                 scene.add(segment);
             }
             
-            // Add birth transition line from mother position to child's position
+            // Add birth transition line from mother position to child's birth position
+            const childData = personMeshes.get(data.id);
+            const childBirthPos = applyPerspective(data.x, data.z, birthDecimal);
+            const motherBirthPos = applyPerspective(
+                mother.userData.x || mother.position.x,
+                mother.userData.z || mother.position.z,
+                birthDecimal
+            );
+            
             const birthTransitionPoints = [
-                new THREE.Vector3(mother.position.x, birthHeight, mother.position.z),
-                new THREE.Vector3(data.x, birthHeight, data.z)
+                new THREE.Vector3(motherBirthPos.x, birthHeight, motherBirthPos.z),
+                new THREE.Vector3(childBirthPos.x, birthHeight, childBirthPos.z)
             ];
             
             const birthLineGeometry = new THREE.BufferGeometry().setFromPoints(birthTransitionPoints);
@@ -819,12 +827,12 @@
             
             // Add arrow showing child "coming out" from mother to independent position
             addArrow(
-                new THREE.Vector3(mother.position.x, birthHeight, mother.position.z),
-                new THREE.Vector3(data.x, birthHeight, data.z),
+                new THREE.Vector3(motherBirthPos.x, birthHeight, motherBirthPos.z),
+                new THREE.Vector3(childBirthPos.x, birthHeight, childBirthPos.z),
                 0x00ffaa
             );
             
-            // Add "birth event" marker
+            // Add "birth event" marker at mother's position
             const birthMarkerGeometry = new THREE.SphereGeometry(0.15, 16, 16);
             const birthMarkerMaterial = new THREE.MeshBasicMaterial({
                 color: 0x00ffaa,
@@ -833,7 +841,7 @@
             });
             
             const birthMarker = new THREE.Mesh(birthMarkerGeometry, birthMarkerMaterial);
-            birthMarker.position.set(mother.position.x, birthHeight, mother.position.z);
+            birthMarker.position.set(motherBirthPos.x, birthHeight, motherBirthPos.z);
             birthMarker.userData = { isBirthMarker: true, childId: data.id };
             conceptionLines.push(birthMarker);
             scene.add(birthMarker);
