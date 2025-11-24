@@ -1,0 +1,22 @@
+{
+  "name": "momi",
+  "version": "1.0.0",
+  "description": "Motives of Mount Improbable - Evolutionary visualization",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed_database.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["evolution", "visualization", "family-tree", "3d"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
