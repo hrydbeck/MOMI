@@ -591,8 +591,8 @@
 
             const mesh = new THREE.Mesh(geometry, material);
             
-            // Calculate the angle to tilt the stack toward origin
-            // The stack should lean so its top points toward the vanishing point (bottom further out)
+            // Calculate the angle to tilt the stack toward origin point (below in the past)
+            // The stack should lean downward and inward so bottom points toward the vanishing point
             const bottomPos = new THREE.Vector3(birthPerspective.x, birthHeight, birthPerspective.z);
             const topPos = new THREE.Vector3(topPerspective.x, birthHeight + height, topPerspective.z);
             const centerPos = new THREE.Vector3(
@@ -601,24 +601,29 @@
                 (birthPerspective.z + topPerspective.z) / 2
             );
             
-            // Vector from stack center toward origin (where we want it to lean)
-            const toOrigin = new THREE.Vector3(
-                VANISHING_POINT.x - centerPos.x,
-                -yPosition, // Negative Y because origin is below
-                VANISHING_POINT.z - centerPos.z
-            );
+            // Calculate the origin point position in 3D space
+            const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            const originPoint = new THREE.Vector3(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
             
-            // Calculate tilt angles - lean the stack so top points more toward origin
-            // The further from origin, the more the stack should tilt inward
+            // Vector from stack bottom to origin point
+            const toOrigin = new THREE.Vector3().subVectors(originPoint, bottomPos);
+            const distance = toOrigin.length();
+            
+            // Calculate rotation to point the stack axis toward origin
+            // Stack should tilt so its bottom edge points toward origin point
             const horizontalDist = Math.sqrt(
                 (centerPos.x - VANISHING_POINT.x) ** 2 + 
                 (centerPos.z - VANISHING_POINT.z) ** 2
             );
+            const verticalDist = Math.abs(originHeight - yPosition);
             
-            // Calculate how much to tilt based on position
-            const tiltFactor = 0.15; // Adjust this for more/less tilt
-            const xTilt = tiltFactor * (centerPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
-            const zTilt = -tiltFactor * (centerPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
+            // Tilt angles to make stack point toward origin
+            const tiltAmount = Math.atan2(horizontalDist, verticalDist);
+            const tiltFactor = 0.6; // Increased for more visible effect
+            
+            // Calculate direction-based tilts
+            const xTilt = -tiltAmount * tiltFactor * (centerPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
+            const zTilt = tiltAmount * tiltFactor * (centerPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
             
             // Apply position and rotation
             mesh.position.set(centerPos.x, centerPos.y, centerPos.z);
@@ -765,14 +770,17 @@
                 );
                 
                 // Calculate tilt toward origin (same as person stacks)
+                const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
                 const horizontalDist = Math.sqrt(
                     (segmentCenterPos.x - VANISHING_POINT.x) ** 2 + 
                     (segmentCenterPos.z - VANISHING_POINT.z) ** 2
                 );
+                const verticalDist = Math.abs(originHeight - segmentCenterY);
+                const tiltAmount = Math.atan2(horizontalDist, verticalDist);
+                const tiltFactor = 0.6;
                 
-                const tiltFactor = 0.15;
-                const xTilt = tiltFactor * (segmentCenterPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
-                const zTilt = -tiltFactor * (segmentCenterPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
+                const xTilt = -tiltAmount * tiltFactor * (segmentCenterPos.z - VANISHING_POINT.z) / (horizontalDist + 0.1);
+                const zTilt = tiltAmount * tiltFactor * (segmentCenterPos.x - VANISHING_POINT.x) / (horizontalDist + 0.1);
                 
                 segment.position.copy(segmentCenterPos);
                 segment.rotation.x = xTilt;
@@ -1090,18 +1098,32 @@
                 scene.add(line);
             });
             
-            // Add a marker at the origin point
-            const originGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+            // Add a prominent marker at the origin point
+            const originGeometry = new THREE.SphereGeometry(0.8, 32, 32);
             const originMaterial = new THREE.MeshPhongMaterial({ 
                 color: 0xffaa00,
-                emissive: 0xff8800,
-                emissiveIntensity: 0.5,
+                emissive: 0xffaa00,
+                emissiveIntensity: 0.8,
                 transparent: true,
-                opacity: 0.7
+                opacity: 0.9
             });
             const originMarker = new THREE.Mesh(originGeometry, originMaterial);
             originMarker.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
             scene.add(originMarker);
+            
+            // Add pulsing point light at origin
+            const originLight = new THREE.PointLight(0xffaa00, 2, 10);
+            originLight.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
+            scene.add(originLight);
+            
+            // Animate the light to pulse
+            const originLightData = { light: originLight, phase: 0 };
+            function animateOriginLight() {
+                originLightData.phase += 0.05;
+                originLightData.light.intensity = 1.5 + Math.sin(originLightData.phase) * 0.5;
+                requestAnimationFrame(animateOriginLight);
+            }
+            animateOriginLight();
             
             // Add a subtle grid at the origin level
             const gridSize = 30;
@@ -1112,26 +1134,36 @@
             gridHelper.material.opacity = 0.1;
             scene.add(gridHelper);
             
-            // Add text label for origin point
-            const originLabelGeometry = new THREE.PlaneGeometry(6, 0.8);
+            // Add clear text label for origin point
+            const originLabelGeometry = new THREE.PlaneGeometry(8, 1.2);
             const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 64;
+            canvas.width = 1024;
+            canvas.height = 128;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#6a8aaa';
-            ctx.font = 'bold 28px Arial';
+            
+            // Add glow effect
+            ctx.shadowColor = '#ffaa00';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = '#ffdd66';
+            ctx.font = 'bold 48px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`Fictional Origin (${ORIGIN_YEAR})`, 256, 40);
+            ctx.fillText('⚡ ORIGIN OF LIFE ⚡', 512, 70);
+            
+            // Add year subtitle
+            ctx.shadowBlur = 10;
+            ctx.font = '32px Arial';
+            ctx.fillStyle = '#ffbb44';
+            ctx.fillText(`(${ORIGIN_YEAR})`, 512, 105);
             
             const texture = new THREE.CanvasTexture(canvas);
             const labelMaterial = new THREE.MeshBasicMaterial({ 
                 map: texture, 
                 transparent: true,
-                opacity: 0.5,
+                opacity: 0.9,
                 side: THREE.DoubleSide
             });
             const label = new THREE.Mesh(originLabelGeometry, labelMaterial);
-            label.position.set(0, originHeight - 0.8, 0);
+            label.position.set(0, originHeight - 1.5, 0);
             label.rotation.x = -Math.PI / 2;
             scene.add(label);
         }
