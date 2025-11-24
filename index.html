@@ -664,11 +664,11 @@
             germlineGeometry.scale(0.15, 1, 0.15);
             const germlineMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffaa00, // Orange/gold for germline
-                shininess: 50,
+                shininess: 30,
                 transparent: true,
-                opacity: 0.8,
+                opacity: 0.4, // More subtle
                 emissive: new THREE.Color(0xffaa00),
-                emissiveIntensity: 0.3
+                emissiveIntensity: 0.1 // Reduced glow
             });
             
             const germlineMesh = new THREE.Mesh(germlineGeometry, germlineMaterial);
