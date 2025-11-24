@@ -2035,6 +2035,13 @@
             createFamily();
         }
         
+        // Open genome browser in new window
+        function openGenomeBrowser(genomeData) {
+            const dataParam = encodeURIComponent(JSON.stringify(genomeData));
+            const url = `genome_browser.html?data=${dataParam}`;
+            window.open(url, '_blank', 'width=1400,height=900');
+        }
+        
         function toggleLifeEvents() {
             lifeEventsVisible = !lifeEventsVisible;
             
