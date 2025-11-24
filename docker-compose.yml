@@ -6,7 +6,7 @@ services:
     container_name: momi_mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27019:27017" # Use port 27019 externally to avoid conflict
     environment:
       MONGO_INITDB_ROOT_USERNAME: momi_user
       MONGO_INITDB_ROOT_PASSWORD: momi_password
