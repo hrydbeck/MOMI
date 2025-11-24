@@ -2222,6 +2222,11 @@
                 // Hide genome toggle button
                 document.getElementById('toggle-genomes').style.display = 'none';
                 document.getElementById('toggle-life-events').style.display = 'none';
+                
+                // Hide all existing life event markers
+                lifeEventMarkers.forEach(marker => {
+                    marker.visible = false;
+                });
             } else {
                 // Restore buttons
                 document.getElementById('toggle-genomes').style.display = 'block';
@@ -2231,6 +2236,13 @@
                 if (genomesVisible) {
                     const legendOverlay = document.getElementById('genome-legend');
                     legendOverlay.style.display = 'block';
+                }
+                
+                // Restore life event markers if they were visible
+                if (lifeEventsVisible) {
+                    lifeEventMarkers.forEach(marker => {
+                        marker.visible = true;
+                    });
                 }
             }
             
