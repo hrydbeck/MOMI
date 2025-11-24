@@ -2219,6 +2219,12 @@
                 
                 console.log('Creating family...');
                 createFamily();
+                
+                // Create genome legend if genomes are visible
+                if (genomesVisible) {
+                    createGenomeLegend();
+                }
+                
                 console.log('Starting animation...');
                 animate();
                 
