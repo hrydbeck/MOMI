@@ -1058,8 +1058,10 @@
                 familyMembers[family.id] = family.members;
             });
             
-            // Add evolutionary perspective guide
-            addEvolutionaryPerspectiveGuide();
+            // Add evolutionary perspective guide only when perspective is enabled
+            if (perspectiveEnabled) {
+                addEvolutionaryPerspectiveGuide();
+            }
 
             // Create all people
             familyData.forEach(person => createPerson(person));
@@ -1623,6 +1625,13 @@
             directionalLight.position.set(10, 20, 10);
             directionalLight.castShadow = true;
             scene.add(directionalLight);
+            
+            // Re-add scene elements
+            addPresentGrid();
+            const axesHelper = new THREE.AxesHelper(5);
+            scene.add(axesHelper);
+            addAxisLabels();
+            addTimeAxis();
             
             // Clear stored data
             personMeshes.clear();
