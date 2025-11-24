@@ -2139,6 +2139,7 @@
         
         function toggleGenomes() {
             genomesVisible = !genomesVisible;
+            console.log('Toggle genomes clicked, genomesVisible is now:', genomesVisible);
             
             // Update button text
             const button = document.getElementById('toggle-genomes');
@@ -2151,14 +2152,18 @@
             });
             
             // Create or toggle legend
+            console.log('genomeLegend exists?', !!genomeLegend);
             if (genomesVisible) {
                 if (!genomeLegend) {
+                    console.log('Creating new legend...');
                     createGenomeLegend();
                 } else {
+                    console.log('Showing existing legend');
                     genomeLegend.visible = true;
                 }
             } else {
                 if (genomeLegend) {
+                    console.log('Hiding legend');
                     genomeLegend.visible = false;
                 }
             }
