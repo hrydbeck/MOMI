@@ -894,6 +894,64 @@
             genomeVisualizations.push(genomeGroup);
         }
         
+        function createGenomeLegend() {
+            // Create a legend sprite showing genome information
+            const canvas = document.createElement('canvas');
+            canvas.width = 320;
+            canvas.height = 140;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Diploid Genome (2n)', canvas.width/2, 25);
+            
+            // Color legend for DNA bases
+            ctx.font = '16px Arial';
+            const legendY = 50;
+            const spacing = 70;
+            
+            // Draw legend boxes and labels
+            const legendColors = [
+                {color: '#ff4444', label: 'A', x: 20},
+                {color: '#44ff44', label: 'T', x: 20 + spacing},
+                {color: '#4444ff', label: 'G', x: 20 + spacing * 2},
+                {color: '#ffff44', label: 'C', x: 20 + spacing * 3}
+            ];
+            
+            legendColors.forEach(item => {
+                ctx.fillStyle = item.color;
+                ctx.fillRect(item.x, legendY, 15, 15);
+                ctx.fillStyle = '#000000';
+                ctx.fillText(item.label, item.x + 27, legendY + 12);
+            });
+            
+            ctx.font = '18px Arial';
+            ctx.fillStyle = '#ff1493';
+            ctx.fillText('♀ Maternal', canvas.width/2 - 60, 95);
+            ctx.fillStyle = '#1e90ff';
+            ctx.fillText('♂ Paternal', canvas.width/2 + 60, 95);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ 
+                map: texture,
+                transparent: true,
+                opacity: 0.95
+            });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(4, 1.75, 1);
+            sprite.position.set(-8, 25, -5);
+            
+            sprite.visible = genomesVisible;
+            sprite.userData = { isGenomeLegend: true };
+            
+            scene.add(sprite);
+            genomeVisualizations.push(sprite);
+        }
+        
         function addLifeEventsMarkers(personId, x, z, birthDecimal, topYear, birthHeight, personHeight, centerPos, rotation) {
             // Get all life events for this person
             const personEvents = lifeEvents.filter(event => event.personId === personId);
@@ -2033,6 +2091,11 @@
             
             // Recreate everything
             createFamily();
+            
+            // Add genome legend if genomes are visible
+            if (genomesVisible) {
+                createGenomeLegend();
+            }
         }
         
         // Open genome browser in new window
@@ -2068,6 +2131,11 @@
             genomeVisualizations.forEach(genome => {
                 genome.visible = genomesVisible;
             });
+            
+            // Add or remove legend
+            if (genomesVisible) {
+                createGenomeLegend();
+            }
         }
         
         let tooltip = null;
