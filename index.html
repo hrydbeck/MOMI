@@ -493,6 +493,62 @@
             
             return geometry;
         }
+        
+        // Create a tapered geometry where edges point toward the vanishing point
+        function createTaperedPersonGeometry(x, z, birthYear, deathYear, sex, height) {
+            const birthPerspective = applyPerspective(x, z, birthYear);
+            const topYear = deathYear || CURRENT_YEAR;
+            const topPerspective = applyPerspective(x, z, topYear);
+            
+            // Calculate the offset from origin for bottom and top
+            const bottomOffsetX = birthPerspective.x - VANISHING_POINT.x;
+            const bottomOffsetZ = birthPerspective.z - VANISHING_POINT.z;
+            const topOffsetX = topPerspective.x - VANISHING_POINT.x;
+            const topOffsetZ = topPerspective.z - VANISHING_POINT.z;
+            
+            // Create custom geometry with vertices
+            const geometry = new THREE.BufferGeometry();
+            
+            const hw = PERSON_WIDTH / 2;
+            const hd = PERSON_DEPTH / 2;
+            const hh = height / 2;
+            
+            // Calculate scale factors for top and bottom based on distance from origin
+            const bottomScale = birthPerspective.scale;
+            const topScale = topPerspective.scale;
+            
+            const vertices = new Float32Array([
+                // Bottom face (smaller, closer to origin)
+                -hw * bottomScale, -hh, -hd * bottomScale,
+                 hw * bottomScale, -hh, -hd * bottomScale,
+                 hw * bottomScale, -hh,  hd * bottomScale,
+                -hw * bottomScale, -hh,  hd * bottomScale,
+                
+                // Top face (larger, further from origin)
+                -hw * topScale, hh, -hd * topScale,
+                 hw * topScale, hh, -hd * topScale,
+                 hw * topScale, hh,  hd * topScale,
+                -hw * topScale, hh,  hd * topScale,
+            ]);
+            
+            const indices = new Uint16Array([
+                // Bottom
+                0, 2, 1, 0, 3, 2,
+                // Top
+                4, 5, 6, 4, 6, 7,
+                // Sides
+                0, 1, 5, 0, 5, 4,
+                1, 2, 6, 1, 6, 5,
+                2, 3, 7, 2, 7, 6,
+                3, 0, 4, 3, 4, 7,
+            ]);
+            
+            geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+            geometry.computeVertexNormals();
+            
+            return geometry;
+        }
 
         function createPerson(data) {
             const { id, name, sex, birthYear, birthMonth = 6, deathYear, x, z, motherId } = data;
@@ -513,15 +569,8 @@
             const deathOrCurrentYear = deathYear || CURRENT_YEAR;
             const topPerspective = applyPerspective(x, z, deathOrCurrentYear);
 
-            // Create geometry based on sex
-            let geometry;
-            if (sex === 'F') {
-                // Rounded box for females
-                geometry = createRoundedBoxGeometry(PERSON_WIDTH, height, PERSON_DEPTH, 0.15, 16);
-            } else {
-                // Regular box for males
-                geometry = new THREE.BoxGeometry(PERSON_WIDTH, height, PERSON_DEPTH);
-            }
+            // Create tapered geometry pointing toward origin
+            const geometry = createTaperedPersonGeometry(x, z, birthDecimal, deathOrCurrentYear, sex, height);
             
             // Create material based on sex and living status
             let color;
@@ -571,7 +620,15 @@
             const germlineWidth = PERSON_WIDTH * 0.15; // Thin central line
             const germlineDepth = PERSON_DEPTH * 0.15;
             
-            const germlineGeometry = new THREE.BoxGeometry(germlineWidth, germlineHeight, germlineDepth);
+            // Create tapered germline
+            const germlineStartYear = birthDecimal + (currentAge * 0.05); // Start slightly after birth
+            const germlineEndYear = deathOrCurrentYear - (currentAge * 0.05); // End slightly before top
+            const germlineGeometry = createTaperedPersonGeometry(
+                x, z, germlineStartYear, germlineEndYear, sex, germlineHeight
+            );
+            
+            // Scale down the germline
+            germlineGeometry.scale(0.15, 1, 0.15);
             const germlineMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffaa00, // Orange/gold for germline
                 shininess: 50,
@@ -624,53 +681,27 @@
                 const nextT = (i + 1) / segments;
                 
                 // Calculate year for this segment (interpolate from conception to birth)
-                const segmentYear = conceptionDecimal + (birthDecimal - conceptionDecimal) * t;
+                const segmentBottomYear = conceptionDecimal + (birthDecimal - conceptionDecimal) * t;
+                const segmentTopYear = conceptionDecimal + (birthDecimal - conceptionDecimal) * nextT;
+                
+                // Create tapered segment geometry
+                const segmentGeom = createTaperedPersonGeometry(
+                    mother.userData.x || mother.position.x,
+                    mother.userData.z || mother.position.z,
+                    segmentBottomYear,
+                    segmentTopYear,
+                    sex,
+                    segmentHeight
+                );
+                
+                // Scale by growth factor (grows from point to full size)
+                segmentGeom.scale(nextT, 1, nextT);
+                
                 const segmentPerspective = applyPerspective(
                     mother.userData.x || mother.position.x, 
                     mother.userData.z || mother.position.z, 
-                    segmentYear
+                    segmentBottomYear
                 );
-                
-                // Width and depth grow from 0 to full size
-                const widthBottom = PERSON_WIDTH * t;
-                const depthBottom = PERSON_DEPTH * t;
-                const widthTop = PERSON_WIDTH * nextT;
-                const depthTop = PERSON_DEPTH * nextT;
-                
-                // Create a frustum (tapered box) for this segment
-                const shape = new THREE.Shape();
-                const hw = widthTop / 2;
-                const hd = depthTop / 2;
-                
-                if (sex === 'F') {
-                    // Rounded for females
-                    const r = 0.15 * nextT;
-                    shape.moveTo(-hw + r, -hd);
-                    shape.lineTo(hw - r, -hd);
-                    shape.quadraticCurveTo(hw, -hd, hw, -hd + r);
-                    shape.lineTo(hw, hd - r);
-                    shape.quadraticCurveTo(hw, hd, hw - r, hd);
-                    shape.lineTo(-hw + r, hd);
-                    shape.quadraticCurveTo(-hw, hd, -hw, hd - r);
-                    shape.lineTo(-hw, -hd + r);
-                    shape.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
-                } else {
-                    // Rectangle for males
-                    shape.moveTo(-hw, -hd);
-                    shape.lineTo(hw, -hd);
-                    shape.lineTo(hw, hd);
-                    shape.lineTo(-hw, hd);
-                    shape.lineTo(-hw, -hd);
-                }
-                
-                const extrudeSettings = {
-                    depth: segmentHeight,
-                    bevelEnabled: false,
-                    steps: 1
-                };
-                
-                const segmentGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-                segmentGeometry.rotateX(Math.PI / 2);
                 
                 const segmentMaterial = new THREE.MeshPhongMaterial({
                     color: childColor,
@@ -679,7 +710,7 @@
                     shininess: 20
                 });
                 
-                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                const segment = new THREE.Mesh(segmentGeom, segmentMaterial);
                 segment.position.set(
                     segmentPerspective.x,
                     conceptionHeight + i * segmentHeight + segmentHeight / 2,
