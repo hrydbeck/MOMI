@@ -424,11 +424,20 @@
         }
 
         function addTimeAxis() {
+            // Base position for axis (will be adjusted with perspective)
+            const baseX = -6;
+            const baseZ = -6;
+            
             // Create vertical axis line - bottom (past) to top (present)
             const maxHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            
+            // Apply perspective to axis endpoints
+            const bottomPos = applyPerspective(baseX, baseZ, OLDEST_YEAR);
+            const topPos = applyPerspective(baseX, baseZ, CURRENT_YEAR);
+            
             const axisPoints = [
-                new THREE.Vector3(-6, 0, -6),
-                new THREE.Vector3(-6, maxHeight, -6)
+                new THREE.Vector3(bottomPos.x, 0, bottomPos.z),
+                new THREE.Vector3(topPos.x, maxHeight, topPos.z)
             ];
             const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisPoints);
             const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
@@ -437,6 +446,12 @@
 
             // Add year labels every 10 years
             const createYearLabel = (year, yPosition) => {
+                // Apply perspective to label position
+                const labelPos = applyPerspective(baseX - 1, baseZ, year);
+                
+                // Scale based on perspective - older years appear smaller
+                const scaleFactor = perspectiveEnabled ? labelPos.scale : 1.0;
+                
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 canvas.width = 128;
@@ -449,14 +464,17 @@
                 const texture = new THREE.CanvasTexture(canvas);
                 const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
                 const sprite = new THREE.Sprite(spriteMaterial);
-                sprite.position.set(-7, yPosition, -6);
-                sprite.scale.set(1.5, 0.75, 1);
+                sprite.position.set(labelPos.x, yPosition, labelPos.z);
+                sprite.scale.set(1.5 * scaleFactor, 0.75 * scaleFactor, 1);
                 scene.add(sprite);
                 
-                // Add tick mark
+                // Add tick mark with perspective
+                const tickPos = applyPerspective(baseX, baseZ, year);
+                const tickEndPos = applyPerspective(baseX - 0.3, baseZ, year);
+                
                 const tickPoints = [
-                    new THREE.Vector3(-6, yPosition, -6),
-                    new THREE.Vector3(-6.3, yPosition, -6)
+                    new THREE.Vector3(tickPos.x, yPosition, tickPos.z),
+                    new THREE.Vector3(tickEndPos.x, yPosition, tickEndPos.z)
                 ];
                 const tickGeometry = new THREE.BufferGeometry().setFromPoints(tickPoints);
                 const tickMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
