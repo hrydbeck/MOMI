@@ -590,8 +590,34 @@
             });
 
             const mesh = new THREE.Mesh(geometry, material);
-            // Use birth perspective for positioning (approximate center)
-            mesh.position.set(birthPerspective.x, yPosition, birthPerspective.z);
+            
+            // Calculate the angle to tilt the stack toward origin
+            // The stack should lean so its centerline points toward the vanishing point
+            const bottomPos = new THREE.Vector3(birthPerspective.x, birthHeight, birthPerspective.z);
+            const topPos = new THREE.Vector3(topPerspective.x, birthHeight + height, topPerspective.z);
+            const centerPos = new THREE.Vector3(
+                (birthPerspective.x + topPerspective.x) / 2,
+                yPosition,
+                (birthPerspective.z + topPerspective.z) / 2
+            );
+            
+            // Calculate rotation to point toward origin
+            const directionToOrigin = new THREE.Vector3(
+                VANISHING_POINT.x - centerPos.x,
+                0, // Don't tilt vertically
+                VANISHING_POINT.z - centerPos.z
+            ).normalize();
+            
+            // Calculate the tilt angle
+            const currentDirection = new THREE.Vector3(0, 1, 0); // Stack points up by default
+            const xTilt = Math.atan2(directionToOrigin.z, directionToOrigin.length());
+            const zTilt = Math.atan2(-directionToOrigin.x, directionToOrigin.length());
+            
+            // Apply position and rotation
+            mesh.position.set(centerPos.x, centerPos.y, centerPos.z);
+            mesh.rotation.x = xTilt * 0.3; // Reduce intensity for subtlety
+            mesh.rotation.z = zTilt * 0.3;
+            
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             
@@ -639,7 +665,8 @@
             });
             
             const germlineMesh = new THREE.Mesh(germlineGeometry, germlineMaterial);
-            germlineMesh.position.set(birthPerspective.x, yPosition, birthPerspective.z);
+            germlineMesh.position.copy(mesh.position); // Same position as main mesh
+            germlineMesh.rotation.copy(mesh.rotation); // Same rotation as main mesh
             germlineMesh.userData = { isGermline: true, personId: id };
             scene.add(germlineMesh);
             
@@ -711,11 +738,38 @@
                 });
                 
                 const segment = new THREE.Mesh(segmentGeom, segmentMaterial);
-                segment.position.set(
-                    segmentPerspective.x,
-                    conceptionHeight + i * segmentHeight + segmentHeight / 2,
-                    segmentPerspective.z
+                
+                const segmentBottomPerspective = applyPerspective(
+                    mother.userData.x || mother.position.x, 
+                    mother.userData.z || mother.position.z, 
+                    segmentBottomYear
                 );
+                const segmentTopPerspective = applyPerspective(
+                    mother.userData.x || mother.position.x, 
+                    mother.userData.z || mother.position.z, 
+                    segmentTopYear
+                );
+                
+                const segmentCenterY = conceptionHeight + i * segmentHeight + segmentHeight / 2;
+                const segmentCenterPos = new THREE.Vector3(
+                    (segmentBottomPerspective.x + segmentTopPerspective.x) / 2,
+                    segmentCenterY,
+                    (segmentBottomPerspective.z + segmentTopPerspective.z) / 2
+                );
+                
+                // Calculate tilt toward origin
+                const dirToOrigin = new THREE.Vector3(
+                    VANISHING_POINT.x - segmentCenterPos.x,
+                    0,
+                    VANISHING_POINT.z - segmentCenterPos.z
+                ).normalize();
+                
+                const xTilt = Math.atan2(dirToOrigin.z, dirToOrigin.length());
+                const zTilt = Math.atan2(-dirToOrigin.x, dirToOrigin.length());
+                
+                segment.position.copy(segmentCenterPos);
+                segment.rotation.x = xTilt * 0.3;
+                segment.rotation.z = zTilt * 0.3;
                 
                 // Store detailed gestation info for click interaction
                 const weekStart = Math.floor((i / segments) * 40);
