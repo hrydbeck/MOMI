@@ -185,6 +185,11 @@
             <div id="title-overlay"><a href="https://en.wikipedia.org/wiki/Climbing_Mount_Improbable" target="_blank">Mount Improbable</a></div>
             <div id="loading">Loading 3D Visualization...</div>
             
+            <!-- View Mode Indicator -->
+            <div id="view-mode-indicator" style="position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold; font-size: 14px; z-index: 1000;">
+                Individual View
+            </div>
+            
             <!-- Genome Legend Overlay -->
             <div id="genome-legend" style="display: none; position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.92); padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); z-index: 1000; font-size: 12px;">
                 <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 6px; color: #333;">Diploid Genome (2n)</div>
@@ -2194,15 +2199,40 @@
             button.textContent = environmentView ? 'Show Individual View' : 'Show Environment View';
             button.style.background = environmentView ? '#8bc34a' : '#4CAF50';
             
+            // Update view mode indicator
+            const indicator = document.getElementById('view-mode-indicator');
+            if (environmentView) {
+                indicator.textContent = 'Environment View';
+                indicator.style.background = 'rgba(139, 195, 74, 0.9)';
+            } else {
+                indicator.textContent = 'Individual View';
+                indicator.style.background = 'rgba(0, 0, 0, 0.7)';
+            }
+            
+            // Hide genomes and life events in environment view
+            if (environmentView) {
+                // Hide genome legend
+                const legendOverlay = document.getElementById('genome-legend');
+                legendOverlay.style.display = 'none';
+                
+                // Hide genome toggle button
+                document.getElementById('toggle-genomes').style.display = 'none';
+                document.getElementById('toggle-life-events').style.display = 'none';
+            } else {
+                // Restore buttons
+                document.getElementById('toggle-genomes').style.display = 'block';
+                document.getElementById('toggle-life-events').style.display = 'block';
+                
+                // Restore genome legend if genomes were visible
+                if (genomesVisible) {
+                    const legendOverlay = document.getElementById('genome-legend');
+                    legendOverlay.style.display = 'block';
+                }
+            }
+            
             // Clear scene and rebuild
             clearScene();
             createFamily();
-            
-            // Restore genome legend if needed
-            if (genomesVisible) {
-                const legendOverlay = document.getElementById('genome-legend');
-                legendOverlay.style.display = 'block';
-            }
         }
         
         let tooltip = null;
