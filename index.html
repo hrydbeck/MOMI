@@ -1126,22 +1126,38 @@
                 const contourYear = ORIGIN_YEAR + ((CURRENT_YEAR - ORIGIN_YEAR) * progress);
                 
                 // Rings get smaller as we climb (mountain gets narrower)
-                const radiusAtHeight = 15 * (1 - progress * 0.6);
+                const baseRadius = 15 * (1 - progress * 0.6);
                 
-                const contourGeometry = new THREE.RingGeometry(radiusAtHeight - 0.3, radiusAtHeight, 32);
-                const contourMaterial = new THREE.MeshBasicMaterial({
+                // Create contour as a line that follows perspective
+                const segments = 64;
+                const contourPoints = [];
+                
+                for (let j = 0; j <= segments; j++) {
+                    const angle = (j / segments) * Math.PI * 2;
+                    const x = Math.cos(angle) * baseRadius;
+                    const z = Math.sin(angle) * baseRadius;
+                    
+                    // Apply perspective transformation to each point
+                    const perspectivePos = applyPerspective(x, z, contourYear);
+                    contourPoints.push(new THREE.Vector3(perspectivePos.x, contourHeight, perspectivePos.z));
+                }
+                
+                const contourGeometry = new THREE.BufferGeometry().setFromPoints(contourPoints);
+                const contourMaterial = new THREE.LineBasicMaterial({
                     color: 0x6a8a9a,
                     transparent: true,
-                    opacity: 0.15 + (progress * 0.1),
-                    side: THREE.DoubleSide
+                    opacity: 0.3 + (progress * 0.2)
                 });
-                const contour = new THREE.Mesh(contourGeometry, contourMaterial);
-                contour.position.set(VANISHING_POINT.x, contourHeight, VANISHING_POINT.z);
-                contour.rotation.x = Math.PI / 2;
-                scene.add(contour);
+                const contourLine = new THREE.Line(contourGeometry, contourMaterial);
+                scene.add(contourLine);
                 
                 // Add elevation markers
                 if (i % 2 === 0) {
+                    const markerAngle = Math.PI / 4;
+                    const markerX = Math.cos(markerAngle) * baseRadius;
+                    const markerZ = Math.sin(markerAngle) * baseRadius;
+                    const markerPos = applyPerspective(markerX, markerZ, contourYear);
+                    
                     const markerCanvas = document.createElement('canvas');
                     markerCanvas.width = 256;
                     markerCanvas.height = 64;
@@ -1158,7 +1174,7 @@
                         opacity: 0.6
                     });
                     const marker = new THREE.Sprite(markerMaterial);
-                    marker.position.set(radiusAtHeight + 2, contourHeight, 0);
+                    marker.position.set(markerPos.x, contourHeight, markerPos.z);
                     marker.scale.set(3, 0.75, 1);
                     scene.add(marker);
                 }
