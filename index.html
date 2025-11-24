@@ -153,6 +153,30 @@
             color: #00ffaa;
             text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
         }
+        
+        .event-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 13px;
+            max-width: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffaa00;
+        }
+        
+        .event-tooltip h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+        
+        .event-tooltip p {
+            margin: 3px 0;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -202,6 +226,7 @@
 
             <button id="reset-camera">Reset Camera View</button>
             <button id="toggle-perspective" style="background: #ff6b35; margin-top: 5px;">Disable Perspective</button>
+            <button id="toggle-life-events" style="background: #9c27b0; margin-top: 5px;">Hide Life Events</button>
 
             <h2>Family Selection</h2>
             <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;">
@@ -241,6 +266,7 @@
         const ORIGIN_YEAR = OLDEST_YEAR - 20; // 20 years before oldest person (1910)
         const VANISHING_POINT = { x: 0, z: 0 }; // All lineages converge here
         let perspectiveEnabled = true; // Toggle for perspective view
+        let lifeEventsVisible = true; // Toggle for life events visibility
 
         // Scene setup
         let scene, camera, renderer, controls;
@@ -248,6 +274,7 @@
         let selectedFamily = null; // 'smith', 'chen', or null for all
         const personMeshes = new Map(); // Map person ID to mesh
         const conceptionLines = []; // Store conception line objects
+        const lifeEventMarkers = []; // Store life event markers and lines
         
         // Family member IDs (populated from API)
         let familyMembers = {};
@@ -352,10 +379,16 @@
             // Perspective toggle button
             document.getElementById('toggle-perspective').addEventListener('click', togglePerspective);
             
+            // Life events toggle button
+            document.getElementById('toggle-life-events').addEventListener('click', toggleLifeEvents);
+            
             // Family selection buttons
             document.getElementById('select-all').addEventListener('click', () => selectFamily(null));
             document.getElementById('select-smith').addEventListener('click', () => selectFamily('smith'));
             document.getElementById('select-chen').addEventListener('click', () => selectFamily('chen'));
+            
+            // Mouse move for hover tooltips
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
 
             // Hide loading message
             document.getElementById('loading').style.display = 'none';
@@ -820,7 +853,9 @@
                     event: event
                 };
                 
+                marker.visible = lifeEventsVisible;
                 scene.add(marker);
+                lifeEventMarkers.push(marker);
                 
                 // Add connecting line from marker to person stack
                 const linePoints = [
@@ -834,7 +869,9 @@
                     opacity: 0.5
                 });
                 const line = new THREE.Line(lineGeometry, lineMaterial);
+                line.visible = lifeEventsVisible;
                 scene.add(line);
+                lifeEventMarkers.push(line);
             });
         }
 
@@ -1868,9 +1905,76 @@
             // Clear stored data
             personMeshes.clear();
             conceptionLines.length = 0;
+            lifeEventMarkers.length = 0;
             
             // Recreate everything
             createFamily();
+        }
+        
+        function toggleLifeEvents() {
+            lifeEventsVisible = !lifeEventsVisible;
+            
+            // Update button text
+            const button = document.getElementById('toggle-life-events');
+            button.textContent = lifeEventsVisible ? 'Hide Life Events' : 'Show Life Events';
+            button.style.background = lifeEventsVisible ? '#9c27b0' : '#4CAF50';
+            
+            // Toggle visibility of all life event markers
+            lifeEventMarkers.forEach(marker => {
+                marker.visible = lifeEventsVisible;
+            });
+        }
+        
+        let tooltip = null;
+        function onMouseMove(event) {
+            const container = document.getElementById('canvas-container');
+            const rect = container.getBoundingClientRect();
+            
+            const mouse = new THREE.Vector2();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check for life event markers
+            const visibleMarkers = lifeEventMarkers.filter(m => m.visible && m.userData.isLifeEvent);
+            const intersects = raycaster.intersectObjects(visibleMarkers);
+
+            if (intersects.length > 0 && intersects[0].object.userData.isLifeEvent) {
+                const eventData = intersects[0].object.userData.event;
+                
+                // Create or update tooltip
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'event-tooltip';
+                    document.body.appendChild(tooltip);
+                }
+                
+                const severityColors = {
+                    'severe': '#ff0000',
+                    'moderate': '#ff9900',
+                    'mild': '#ffff00',
+                    'positive': '#00ff00'
+                };
+                
+                tooltip.innerHTML = `
+                    <h4 style="color: ${severityColors[eventData.severity] || '#ffffff'}">${eventData.name}</h4>
+                    <p><strong>Year:</strong> ${eventData.onsetYear}</p>
+                    <p><strong>Severity:</strong> ${eventData.severity}</p>
+                    <p><strong>Type:</strong> ${eventData.eventType}</p>
+                    <p style="margin-top: 5px; font-style: italic;">${eventData.description}</p>
+                `;
+                
+                tooltip.style.left = (event.clientX + 15) + 'px';
+                tooltip.style.top = (event.clientY + 15) + 'px';
+                tooltip.style.display = 'block';
+            } else {
+                // Remove tooltip
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            }
         }
 
         function onWindowResize() {
