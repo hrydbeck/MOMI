@@ -432,15 +432,17 @@
             const baseX = -6;
             const baseZ = -6;
             
-            // Create vertical axis line - bottom (past) to top (present)
+            // Create vertical axis line - bottom (origin/past) to top (present)
             const maxHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            const bottomHeight = perspectiveEnabled ? (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE : 0;
             
             // Apply perspective to axis endpoints
-            const bottomPos = applyPerspective(baseX, baseZ, OLDEST_YEAR);
+            const bottomYear = perspectiveEnabled ? ORIGIN_YEAR : OLDEST_YEAR;
+            const bottomPos = applyPerspective(baseX, baseZ, bottomYear);
             const topPos = applyPerspective(baseX, baseZ, CURRENT_YEAR);
             
             const axisPoints = [
-                new THREE.Vector3(bottomPos.x, 0, bottomPos.z),
+                new THREE.Vector3(bottomPos.x, bottomHeight, bottomPos.z),
                 new THREE.Vector3(topPos.x, maxHeight, topPos.z)
             ];
             const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisPoints);
