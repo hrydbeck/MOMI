@@ -224,6 +224,12 @@
         const YEAR_SCALE = 0.1; // 1 year = 0.1 units in 3D space
         const CURRENT_YEAR = 2025;
         const OLDEST_YEAR = 1930; // Reference point for the bottom of the timeline
+        
+        // Evolutionary perspective - all life converges toward origin
+        const ORIGIN_OF_LIFE_YEARS_AGO = 3800000000; // 3.8 billion years ago
+        const PERSPECTIVE_REFERENCE_YEAR = 1930; // Our visualization starts here
+        const PERSPECTIVE_SCALE = 0.00000015; // Tweaked for visible effect with massive timescales
+        const VANISHING_POINT = { x: 0, z: 0 }; // All lineages converge here at origin of life
 
         // Scene setup
         let scene, camera, renderer, controls;
@@ -234,6 +240,33 @@
         
         // Family member IDs (populated from API)
         let familyMembers = {};
+        
+        // Calculate perspective scaling based on evolutionary time depth
+        function getPerspectiveScale(year) {
+            // How far back from our reference point (1930)
+            const yearsFromReference = PERSPECTIVE_REFERENCE_YEAR - year;
+            
+            // Time since origin of life from this year
+            const yearsFromOrigin = ORIGIN_OF_LIFE_YEARS_AGO + (CURRENT_YEAR - year);
+            
+            // Perspective factor: closer to origin = smaller scale (converging)
+            // Using logarithmic scale since timescales are so massive
+            const perspectiveFactor = 1.0 - (PERSPECTIVE_SCALE * yearsFromOrigin);
+            
+            // Clamp to prevent negative or zero scale
+            return Math.max(0.3, Math.min(1.0, perspectiveFactor));
+        }
+        
+        // Apply perspective convergence to X/Z positions
+        function applyPerspective(x, z, year) {
+            const scale = getPerspectiveScale(year);
+            
+            // Positions converge toward vanishing point as we go back in time
+            const perspectiveX = VANISHING_POINT.x + (x - VANISHING_POINT.x) * scale;
+            const perspectiveZ = VANISHING_POINT.z + (z - VANISHING_POINT.z) * scale;
+            
+            return { x: perspectiveX, z: perspectiveZ, scale };
+        }
 
         function init() {
             // Scene
@@ -486,6 +519,11 @@
             const height = currentAge * YEAR_SCALE;
             const birthHeight = (birthDecimal - OLDEST_YEAR) * YEAR_SCALE; // Birth position from bottom
             const yPosition = birthHeight + height / 2; // Center of the box (birth + half height)
+            
+            // Apply evolutionary perspective - positions converge toward origin of life
+            const birthPerspective = applyPerspective(x, z, birthDecimal);
+            const deathOrCurrentYear = deathYear || CURRENT_YEAR;
+            const topPerspective = applyPerspective(x, z, deathOrCurrentYear);
 
             // Create geometry based on sex
             let geometry;
@@ -515,9 +553,14 @@
             });
 
             const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(x, yPosition, z);
+            // Use birth perspective for positioning (approximate center)
+            mesh.position.set(birthPerspective.x, yPosition, birthPerspective.z);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
+            
+            // Store perspective data for later use
+            mesh.userData.birthPerspective = birthPerspective;
+            mesh.userData.topPerspective = topPerspective;
 
             if (sex === 'F' && !deathYear) {
                 // Add subtle emissive glow to living females
@@ -527,6 +570,8 @@
 
             // Store reference to person data
             mesh.userData = data;
+            mesh.userData.x = x; // Store original x for perspective calculations
+            mesh.userData.z = z; // Store original z for perspective calculations
             mesh.userData.birthHeight = birthHeight;
             mesh.userData.conceptionHeight = (conceptionDecimal - OLDEST_YEAR) * YEAR_SCALE;
 
@@ -549,31 +594,37 @@
             });
             
             const germlineMesh = new THREE.Mesh(germlineGeometry, germlineMaterial);
-            germlineMesh.position.set(x, yPosition, z);
+            germlineMesh.position.set(birthPerspective.x, yPosition, birthPerspective.z);
             germlineMesh.userData = { isGermline: true, personId: id };
             scene.add(germlineMesh);
             
             // Store germline position for conception connections
-            mesh.userData.germlinePosition = { x, y: yPosition, z };
+            mesh.userData.germlinePosition = { 
+                x: birthPerspective.x, 
+                y: yPosition, 
+                z: birthPerspective.z 
+            };
 
             // Add gestation period visualization (9 months growing inside mother)
             if (motherId) {
-                addGestationStack(data, mesh.userData.conceptionHeight, birthHeight, color);
+                addGestationStack(data, mesh.userData.conceptionHeight, birthHeight, color, birthPerspective);
             }
 
-            // Add name label
-            addNameLabel(name, x, birthHeight + height / 2 + 0.5, z);
+            // Add name label (use original x, z for now)
+            addNameLabel(name, birthPerspective.x, birthHeight + height / 2 + 0.5, birthPerspective.z);
 
             return mesh;
         }
 
-        function addGestationStack(data, conceptionHeight, birthHeight, childColor) {
-            const { motherId, sex } = data;
+        function addGestationStack(data, conceptionHeight, birthHeight, childColor, childPerspective) {
+            const { motherId, sex, birthYear, birthMonth = 6 } = data;
             
             const mother = personMeshes.get(motherId);
             if (!mother) return;
             
             const gestationHeight = birthHeight - conceptionHeight; // 9 months
+            const birthDecimal = birthYear + (birthMonth - 1) / 12;
+            const conceptionDecimal = birthDecimal - (9/12);
             
             // Create a tapered geometry that grows from a point to full size
             // We'll use multiple segments to create the growing effect
@@ -583,6 +634,14 @@
             for (let i = 0; i < segments; i++) {
                 const t = i / segments; // 0 to 1
                 const nextT = (i + 1) / segments;
+                
+                // Calculate year for this segment (interpolate from conception to birth)
+                const segmentYear = conceptionDecimal + (birthDecimal - conceptionDecimal) * t;
+                const segmentPerspective = applyPerspective(
+                    mother.userData.x || mother.position.x, 
+                    mother.userData.z || mother.position.z, 
+                    segmentYear
+                );
                 
                 // Width and depth grow from 0 to full size
                 const widthBottom = PERSON_WIDTH * t;
@@ -634,9 +693,9 @@
                 
                 const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
                 segment.position.set(
-                    mother.position.x,
+                    segmentPerspective.x,
                     conceptionHeight + i * segmentHeight + segmentHeight / 2,
-                    mother.position.z
+                    segmentPerspective.z
                 );
                 
                 // Store detailed gestation info for click interaction
@@ -730,19 +789,29 @@
 
             // Use CONCEPTION height (9 months before birth) not birth height
             const conceptionHeight = child.userData.conceptionHeight;
+            const childBirthYear = child.userData.birthYear;
+            const conceptionYear = childBirthYear - 0.75; // 9 months before birth
+            
+            // Get perspective positions at conception time
+            const fatherConceptionPos = applyPerspective(
+                father.userData.x || father.position.x,
+                father.userData.z || father.position.z,
+                conceptionYear
+            );
+            const motherConceptionPos = applyPerspective(
+                mother.userData.x || mother.position.x,
+                mother.userData.z || mother.position.z,
+                conceptionYear
+            );
 
             // Create points for the connection at conception time (when sperm fertilizes egg)
             const points = [];
             
             // Father's GERMLINE position at conception time (sperm comes from germline)
-            const fatherX = father.position.x;
-            const fatherZ = father.position.z;
-            points.push(new THREE.Vector3(fatherX, conceptionHeight, fatherZ));
+            points.push(new THREE.Vector3(fatherConceptionPos.x, conceptionHeight, fatherConceptionPos.z));
 
             // Mother's GERMLINE position at conception time (egg comes from germline, fertilized egg starts here)
-            const motherX = mother.position.x;
-            const motherZ = mother.position.z;
-            points.push(new THREE.Vector3(motherX, conceptionHeight, motherZ));
+            points.push(new THREE.Vector3(motherConceptionPos.x, conceptionHeight, motherConceptionPos.z));
 
             // NOTE: We don't connect to child's position here because at conception,
             // the child is just a point inside the mother
@@ -764,8 +833,8 @@
             conceptionLines.push(line);
 
             // Add arrow pointing from father to mother at conception to show direction of inheritance
-            addArrow(new THREE.Vector3(fatherX, conceptionHeight, fatherZ), 
-                     new THREE.Vector3(motherX, conceptionHeight, motherZ), 0xffff00);
+            addArrow(new THREE.Vector3(fatherConceptionPos.x, conceptionHeight, fatherConceptionPos.z), 
+                     new THREE.Vector3(motherConceptionPos.x, conceptionHeight, motherConceptionPos.z), 0xffff00);
 
             // Add small spheres at connection points
             const sphereGeometry = new THREE.SphereGeometry(0.1, 16, 16);
@@ -882,6 +951,9 @@
             families.forEach(family => {
                 familyMembers[family.id] = family.members;
             });
+            
+            // Add evolutionary perspective guide
+            addEvolutionaryPerspectiveGuide();
 
             // Create all people
             familyData.forEach(person => createPerson(person));
@@ -890,6 +962,75 @@
             conceptions.forEach(conception => {
                 createConceptionBar(conception.father, conception.mother, conception.child);
             });
+        }
+        
+        // Add visual guide showing convergence toward origin of life
+        function addEvolutionaryPerspectiveGuide() {
+            // Create converging lines from current family positions to origin
+            const guidePositions = [
+                { x: -10, z: -10 },
+                { x: -10, z: 10 },
+                { x: 10, z: -10 },
+                { x: 10, z: 10 },
+                { x: 0, z: -15 },
+                { x: 0, z: 15 },
+                { x: -15, z: 0 },
+                { x: 15, z: 0 }
+            ];
+            
+            const lineColor = 0x3a5a7a;
+            const lineMaterial = new THREE.LineBasicMaterial({ 
+                color: lineColor,
+                transparent: true,
+                opacity: 0.2
+            });
+            
+            guidePositions.forEach(pos => {
+                // Line from "present" position down to origin
+                const presentPos = applyPerspective(pos.x, pos.z, CURRENT_YEAR);
+                const pastPos = applyPerspective(pos.x, pos.z, OLDEST_YEAR - 50);
+                
+                const points = [
+                    new THREE.Vector3(presentPos.x, (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE, presentPos.z),
+                    new THREE.Vector3(pastPos.x, -5, pastPos.z)
+                ];
+                
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geometry, lineMaterial);
+                scene.add(line);
+            });
+            
+            // Add a subtle grid at the bottom showing convergence
+            const gridSize = 30;
+            const gridDivisions = 15;
+            const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, 0x4a6a8a, 0x3a5a7a);
+            gridHelper.position.y = -5.5;
+            gridHelper.material.transparent = true;
+            gridHelper.material.opacity = 0.15;
+            scene.add(gridHelper);
+            
+            // Add text label for origin of life
+            const originLabelGeometry = new THREE.PlaneGeometry(8, 1);
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#4a6a8a';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('← Origin of Life (3.8 billion years ago)', 256, 40);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const labelMaterial = new THREE.MeshBasicMaterial({ 
+                map: texture, 
+                transparent: true,
+                opacity: 0.4,
+                side: THREE.DoubleSide
+            });
+            const label = new THREE.Mesh(originLabelGeometry, labelMaterial);
+            label.position.set(0, -6, 0);
+            label.rotation.x = -Math.PI / 2;
+            scene.add(label);
         }
 
         function onMouseClick(event) {
