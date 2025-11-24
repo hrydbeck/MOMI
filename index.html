@@ -225,11 +225,9 @@
         const CURRENT_YEAR = 2025;
         const OLDEST_YEAR = 1930; // Reference point for the bottom of the timeline
         
-        // Evolutionary perspective - all life converges toward origin
-        const ORIGIN_OF_LIFE_YEARS_AGO = 3800000000; // 3.8 billion years ago
-        const PERSPECTIVE_REFERENCE_YEAR = 1930; // Our visualization starts here
-        const PERSPECTIVE_SCALE = 0.00000015; // Tweaked for visible effect with massive timescales
-        const VANISHING_POINT = { x: 0, z: 0 }; // All lineages converge here at origin of life
+        // Evolutionary perspective - fictional origin point for visualization
+        const ORIGIN_YEAR = OLDEST_YEAR - 20; // 20 years before oldest person (1910)
+        const VANISHING_POINT = { x: 0, z: 0 }; // All lineages converge here
 
         // Scene setup
         let scene, camera, renderer, controls;
@@ -241,25 +239,15 @@
         // Family member IDs (populated from API)
         let familyMembers = {};
         
-        // Calculate perspective scaling based on evolutionary time depth
-        function getPerspectiveScale(year) {
-            // How far back from our reference point (1930)
-            const yearsFromReference = PERSPECTIVE_REFERENCE_YEAR - year;
-            
-            // Time since origin of life from this year
-            const yearsFromOrigin = ORIGIN_OF_LIFE_YEARS_AGO + (CURRENT_YEAR - year);
-            
-            // Perspective factor: closer to origin = smaller scale (converging)
-            // Using logarithmic scale since timescales are so massive
-            const perspectiveFactor = 1.0 - (PERSPECTIVE_SCALE * yearsFromOrigin);
-            
-            // Clamp to prevent negative or zero scale
-            return Math.max(0.3, Math.min(1.0, perspectiveFactor));
-        }
-        
         // Apply perspective convergence to X/Z positions
+        // Linear interpolation: at CURRENT_YEAR = full position, at ORIGIN_YEAR = vanishing point
         function applyPerspective(x, z, year) {
-            const scale = getPerspectiveScale(year);
+            // Calculate how far we are from origin to present
+            const totalYears = CURRENT_YEAR - ORIGIN_YEAR;
+            const yearFromOrigin = year - ORIGIN_YEAR;
+            
+            // Scale factor: 0 at origin, 1 at present
+            const scale = Math.max(0, Math.min(1, yearFromOrigin / totalYears));
             
             // Positions converge toward vanishing point as we go back in time
             const perspectiveX = VANISHING_POINT.x + (x - VANISHING_POINT.x) * scale;
@@ -964,9 +952,9 @@
             });
         }
         
-        // Add visual guide showing convergence toward origin of life
+        // Add visual guide showing convergence toward origin point
         function addEvolutionaryPerspectiveGuide() {
-            // Create converging lines from current family positions to origin
+            // Create converging lines from family positions to origin
             const guidePositions = [
                 { x: -10, z: -10 },
                 { x: -10, z: 10 },
@@ -982,17 +970,19 @@
             const lineMaterial = new THREE.LineBasicMaterial({ 
                 color: lineColor,
                 transparent: true,
-                opacity: 0.2
+                opacity: 0.15
             });
             
+            const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            
             guidePositions.forEach(pos => {
-                // Line from "present" position down to origin
+                // Line from present position down to origin point
                 const presentPos = applyPerspective(pos.x, pos.z, CURRENT_YEAR);
-                const pastPos = applyPerspective(pos.x, pos.z, OLDEST_YEAR - 50);
+                const originPos = applyPerspective(pos.x, pos.z, ORIGIN_YEAR);
                 
                 const points = [
                     new THREE.Vector3(presentPos.x, (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE, presentPos.z),
-                    new THREE.Vector3(pastPos.x, -5, pastPos.z)
+                    new THREE.Vector3(originPos.x, originHeight, originPos.z)
                 ];
                 
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -1000,35 +990,48 @@
                 scene.add(line);
             });
             
-            // Add a subtle grid at the bottom showing convergence
+            // Add a marker at the origin point
+            const originGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const originMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffaa00,
+                emissive: 0xff8800,
+                emissiveIntensity: 0.5,
+                transparent: true,
+                opacity: 0.7
+            });
+            const originMarker = new THREE.Mesh(originGeometry, originMaterial);
+            originMarker.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
+            scene.add(originMarker);
+            
+            // Add a subtle grid at the origin level
             const gridSize = 30;
             const gridDivisions = 15;
             const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, 0x4a6a8a, 0x3a5a7a);
-            gridHelper.position.y = -5.5;
+            gridHelper.position.y = originHeight - 0.1;
             gridHelper.material.transparent = true;
-            gridHelper.material.opacity = 0.15;
+            gridHelper.material.opacity = 0.1;
             scene.add(gridHelper);
             
-            // Add text label for origin of life
-            const originLabelGeometry = new THREE.PlaneGeometry(8, 1);
+            // Add text label for origin point
+            const originLabelGeometry = new THREE.PlaneGeometry(6, 0.8);
             const canvas = document.createElement('canvas');
             canvas.width = 512;
             canvas.height = 64;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#4a6a8a';
-            ctx.font = 'bold 32px Arial';
+            ctx.fillStyle = '#6a8aaa';
+            ctx.font = 'bold 28px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('← Origin of Life (3.8 billion years ago)', 256, 40);
+            ctx.fillText(`Fictional Origin (${ORIGIN_YEAR})`, 256, 40);
             
             const texture = new THREE.CanvasTexture(canvas);
             const labelMaterial = new THREE.MeshBasicMaterial({ 
                 map: texture, 
                 transparent: true,
-                opacity: 0.4,
+                opacity: 0.5,
                 side: THREE.DoubleSide
             });
             const label = new THREE.Mesh(originLabelGeometry, labelMaterial);
-            label.position.set(0, -6, 0);
+            label.position.set(0, originHeight - 0.8, 0);
             label.rotation.x = -Math.PI / 2;
             scene.add(label);
         }
