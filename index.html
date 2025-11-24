@@ -745,8 +745,86 @@
 
             // Add name label at the center of the stack
             addNameLabel(name, centerPos.x, centerPos.y + height / 2 + 0.5, centerPos.z);
+            
+            // Add life events markers
+            addLifeEventsMarkers(id, x, z, birthDecimal, deathOrCurrentYear, birthHeight, height, centerPos, mesh.rotation);
 
             return mesh;
+        }
+        
+        function addLifeEventsMarkers(personId, x, z, birthDecimal, topYear, birthHeight, personHeight, centerPos, rotation) {
+            // Get all life events for this person
+            const personEvents = lifeEvents.filter(event => event.personId === personId);
+            
+            if (personEvents.length === 0) return;
+            
+            personEvents.forEach(event => {
+                const eventYear = event.onsetYear + 0.5; // Mid-year
+                
+                // Skip if event is outside person's lifetime
+                if (eventYear < birthDecimal || eventYear > topYear) return;
+                
+                // Calculate Y position of event on the person's timeline
+                const eventHeight = (eventYear - OLDEST_YEAR) * YEAR_SCALE;
+                
+                // Apply perspective to event position
+                const eventPerspective = applyPerspective(x, z, eventYear);
+                
+                // Determine marker color and size based on event type and severity
+                let markerColor, markerSize;
+                switch (event.severity) {
+                    case 'severe':
+                        markerColor = 0xff0000; // Red
+                        markerSize = 0.4;
+                        break;
+                    case 'moderate':
+                        markerColor = 0xff9900; // Orange
+                        markerSize = 0.3;
+                        break;
+                    case 'mild':
+                        markerColor = 0xffff00; // Yellow
+                        markerSize = 0.25;
+                        break;
+                    case 'positive':
+                        markerColor = 0x00ff00; // Green
+                        markerSize = 0.3;
+                        break;
+                    default:
+                        markerColor = 0xffffff; // White
+                        markerSize = 0.25;
+                }
+                
+                // Create marker sphere
+                const markerGeometry = new THREE.SphereGeometry(markerSize, 16, 16);
+                const markerMaterial = new THREE.MeshPhongMaterial({
+                    color: markerColor,
+                    emissive: markerColor,
+                    emissiveIntensity: 0.5,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                
+                // Position marker at the side of the person stack
+                const offsetDistance = 1.2;
+                marker.position.set(
+                    eventPerspective.x + offsetDistance,
+                    eventHeight,
+                    eventPerspective.z
+                );
+                
+                // Store event data
+                marker.userData = {
+                    isLifeEvent: true,
+                    personId: personId,
+                    event: event
+                };
+                
+                scene.add(marker);
+                
+                // Add connecting line from marker to person stack
+                const linePoints = [\n                    new THREE.Vector3(centerPos.x, eventHeight, centerPos.z),\n                    new THREE.Vector3(eventPerspective.x + offsetDistance, eventHeight, eventPerspective.z)\n                ];\n                const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);\n                const lineMaterial = new THREE.LineBasicMaterial({\n                    color: markerColor,\n                    transparent: true,\n                    opacity: 0.5\n                });\n                const line = new THREE.Line(lineGeometry, lineMaterial);\n                scene.add(line);
+            });
         }
 
         function addGestationStack(data, conceptionHeight, birthHeight, childColor, childPerspective) {
@@ -1034,6 +1112,7 @@
         let familyData = [];
         let conceptions = [];
         let families = [];
+        let lifeEvents = [];
 
         // API configuration
         const API_BASE_URL = 'http://localhost:3001/api';
@@ -1044,19 +1123,21 @@
                 document.getElementById('loading').innerHTML = 'Loading family data...';
                 
                 // Fetch all data in parallel
-                const [personsResponse, conceptionsResponse, familiesResponse] = await Promise.all([
+                const [personsResponse, conceptionsResponse, familiesResponse, lifeEventsResponse] = await Promise.all([
                     fetch(`${API_BASE_URL}/persons`),
                     fetch(`${API_BASE_URL}/conceptions`),
-                    fetch(`${API_BASE_URL}/families`)
+                    fetch(`${API_BASE_URL}/families`),
+                    fetch(`${API_BASE_URL}/lifeEvents`)
                 ]);
 
-                if (!personsResponse.ok || !conceptionsResponse.ok || !familiesResponse.ok) {
+                if (!personsResponse.ok || !conceptionsResponse.ok || !familiesResponse.ok || !lifeEventsResponse.ok) {
                     throw new Error('Failed to fetch data from API');
                 }
 
                 const persons = await personsResponse.json();
                 const conceptionsData = await conceptionsResponse.json();
                 families = await familiesResponse.json();
+                lifeEvents = await lifeEventsResponse.json();
 
                 // Transform MongoDB data to visualization format
                 familyData = persons.map(person => ({
@@ -1079,7 +1160,7 @@
                     child: c.childId
                 }));
 
-                console.log(`Loaded ${familyData.length} persons, ${conceptions.length} conceptions, ${families.length} families from API`);
+                console.log(`Loaded ${familyData.length} persons, ${conceptions.length} conceptions, ${families.length} families, ${lifeEvents.length} life events from API`);
                 return true;
             } catch (error) {
                 console.error('Error loading data from API:', error);
@@ -1295,8 +1376,19 @@
             const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
 
-            // Check for gestation segments first
+            // Check for life event markers first
             const allObjects = scene.children;
+            const lifeEventIntersects = raycaster.intersectObjects(allObjects.filter(obj => obj.userData.isLifeEvent));
+            
+            if (lifeEventIntersects.length > 0) {
+                const eventMarker = lifeEventIntersects[0].object;
+                const eventData = eventMarker.userData.event;
+                
+                alert(`Life Event: ${eventData.name}\\nYear: ${eventData.onsetYear}\\nSeverity: ${eventData.severity}\\nDescription: ${eventData.description}`);
+                return;
+            }
+            
+            // Check for gestation segments
             const gestationIntersects = raycaster.intersectObjects(allObjects.filter(obj => obj.userData.isGestation));
             
             if (gestationIntersects.length > 0) {
@@ -1486,6 +1578,26 @@
                 `${monthNames[data.birthMonth - 1]} ${data.birthYear}` : 
                 data.birthYear;
             
+            // Get life events for this person
+            const personEvents = lifeEvents.filter(event => event.personId === data.id);
+            let eventsHtml = '';
+            if (personEvents.length > 0) {
+                eventsHtml = '<p><strong>Life Events:</strong></p><ul style="margin: 5px 0; padding-left: 20px;">';
+                personEvents.forEach(event => {
+                    const severityColor = {
+                        'severe': '#ff0000',
+                        'moderate': '#ff9900',
+                        'mild': '#ffff00',
+                        'positive': '#00ff00'
+                    }[event.severity] || '#ffffff';
+                    eventsHtml += `<li style="color: ${severityColor}; margin: 3px 0;">
+                        <strong>${event.name}</strong> (${event.onsetYear})<br/>
+                        <span style="color: #666; font-size: 11px;">${event.description}</span>
+                    </li>`;
+                });
+                eventsHtml += '</ul>';
+            }
+            
             const html = `
                 <div class="person-info">
                     <h3>${data.name}</h3>
@@ -1494,6 +1606,7 @@
                     <p><strong>Age:</strong> ${age.toFixed(1)} years</p>
                     <p><strong>Status:</strong> ${status}</p>
                     <p><strong>Position:</strong> (${data.x.toFixed(1)}, ${data.z.toFixed(1)})</p>
+                    ${eventsHtml}
                 </div>
             `;
             

@@ -57,6 +57,36 @@ app.get('/api/families', async (req, res) => {
     }
 });
 
+// Get all life events
+app.get('/api/lifeEvents', async (req, res) => {
+    try {
+        const lifeEvents = await db.collection('lifeEvents').find({}).toArray();
+        res.json(lifeEvents);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get life events for a specific person
+app.get('/api/lifeEvents/person/:personId', async (req, res) => {
+    try {
+        const events = await db.collection('lifeEvents').find({ personId: req.params.personId }).toArray();
+        res.json(events);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Add new life event
+app.post('/api/lifeEvents', async (req, res) => {
+    try {
+        const result = await db.collection('lifeEvents').insertOne(req.body);
+        res.status(201).json({ _id: result.insertedId, ...req.body });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get specific person by ID
 app.get('/api/persons/:id', async (req, res) => {
     try {

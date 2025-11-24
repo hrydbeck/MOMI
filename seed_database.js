@@ -58,6 +58,23 @@ const familyMembers = {
     chen: ['gf3', 'gm3', 'gf4', 'gm4', 'f2', 'm2', 'c4', 'c5']
 };
 
+// Life events - diseases, medical conditions, significant life events
+const lifeEvents = [
+    // Smith Family events
+    { id: 'evt1', personId: 'gf1', eventType: 'disease', name: 'Diabetes Type 2', onsetYear: 1985, severity: 'moderate', description: 'Diagnosed with Type 2 Diabetes' },
+    { id: 'evt2', personId: 'gf1', eventType: 'disease', name: 'Heart Disease', onsetYear: 2010, severity: 'severe', description: 'Coronary artery disease' },
+    { id: 'evt3', personId: 'gm1', eventType: 'disease', name: 'Osteoporosis', onsetYear: 2000, severity: 'moderate', description: 'Bone density loss' },
+    { id: 'evt4', personId: 'f1', eventType: 'disease', name: 'Hypertension', onsetYear: 2015, severity: 'mild', description: 'High blood pressure' },
+    { id: 'evt5', personId: 'c1', eventType: 'disease', name: 'Asthma', onsetYear: 2005, severity: 'mild', description: 'Childhood asthma' },
+    { id: 'evt6', personId: 'c2', eventType: 'milestone', name: 'Graduate Degree', onsetYear: 2020, severity: 'positive', description: 'Completed Masters degree' },
+    
+    // Chen Family events
+    { id: 'evt7', personId: 'gf3', eventType: 'disease', name: 'Cancer', onsetYear: 2018, severity: 'severe', description: 'Lung cancer diagnosis' },
+    { id: 'evt8', personId: 'gm3', eventType: 'disease', name: 'Arthritis', onsetYear: 2010, severity: 'moderate', description: 'Rheumatoid arthritis' },
+    { id: 'evt9', personId: 'm2', eventType: 'disease', name: 'Migraine', onsetYear: 2010, severity: 'mild', description: 'Chronic migraines' },
+    { id: 'evt10', personId: 'c4', eventType: 'disease', name: 'Allergies', onsetYear: 2008, severity: 'mild', description: 'Seasonal allergies' },
+];
+
 async function seedDatabase() {
     const client = new MongoClient(url);
 
@@ -71,6 +88,7 @@ async function seedDatabase() {
         await db.collection('persons').deleteMany({});
         await db.collection('conceptions').deleteMany({});
         await db.collection('families').deleteMany({});
+        await db.collection('lifeEvents').deleteMany({});
         
         console.log('Cleared existing data');
 
@@ -81,6 +99,10 @@ async function seedDatabase() {
         // Insert conceptions
         const conceptionsResult = await db.collection('conceptions').insertMany(conceptions);
         console.log(`Inserted ${conceptionsResult.insertedCount} conceptions`);
+        
+        // Insert life events
+        const lifeEventsResult = await db.collection('lifeEvents').insertMany(lifeEvents);
+        console.log(`Inserted ${lifeEventsResult.insertedCount} life events`);
 
         // Insert family metadata
         const families = [
