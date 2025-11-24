@@ -821,11 +821,15 @@
             // Add name label at the center of the stack
             addNameLabel(name, centerPos.x, centerPos.y + height / 2 + 0.5, centerPos.z);
             
-            // Add life events markers
-            addLifeEventsMarkers(id, x, z, birthDecimal, deathOrCurrentYear, birthHeight, height, centerPos, mesh.rotation);
+            // Add life events markers (only in individual view)
+            if (!environmentView) {
+                addLifeEventsMarkers(id, x, z, birthDecimal, deathOrCurrentYear, birthHeight, height, centerPos, mesh.rotation);
+            }
             
-            // Create genome visualization (hidden by default)
-            addDiploidGenomeVisualization(id, centerPos, height, sex, motherId, data.fatherId);
+            // Create genome visualization (only in individual view, hidden by default)
+            if (!environmentView) {
+                addDiploidGenomeVisualization(id, centerPos, height, sex, motherId, data.fatherId);
+            }
 
             return mesh;
         }
