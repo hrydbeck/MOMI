@@ -1889,22 +1889,29 @@
         // Initialize and start
         async function startVisualization() {
             try {
+                console.log('Starting visualization...');
                 init();
+                console.log('Initialized scene');
                 
                 // Load data from API
                 const dataLoaded = await loadDataFromAPI();
+                console.log('Data loaded:', dataLoaded);
                 if (!dataLoaded) {
                     return; // Error already displayed by loadDataFromAPI
                 }
                 
+                console.log('Creating family...');
                 createFamily();
+                console.log('Starting animation...');
                 animate();
                 
                 // Hide loading screen
                 document.getElementById('loading').style.display = 'none';
+                console.log('Visualization complete');
             } catch (error) {
                 console.error('Error initializing visualization:', error);
-                document.getElementById('loading').innerHTML = 'Error loading visualization. Check console for details.<br><br>' + error.message;
+                console.error('Stack trace:', error.stack);
+                document.getElementById('loading').innerHTML = 'Error loading visualization. Check console for details.<br><br>' + error.message + '<br><br>' + error.stack;
                 document.getElementById('loading').style.background = 'rgba(255, 0, 0, 0.7)';
             }
         }
