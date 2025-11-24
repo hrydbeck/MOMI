@@ -795,104 +795,121 @@
         }
         
         function addDiploidGenomeVisualization(personId, centerPos, personHeight, sex, motherId, fatherId) {
-            // Create a double helix visualization representing maternal and paternal chromosomes
+            // Create two adjacent barcodes representing maternal and paternal chromosomes
             const genomeGroup = new THREE.Group();
             
             // Position genome marker to the side of the person
             const offsetX = 1.8;
-            const genomeHeight = Math.min(personHeight * 0.6, 3); // Cap height for visibility
-            const helixRadius = 0.15;
-            const turns = 3;
+            const barcodeHeight = Math.min(personHeight * 0.6, 3);
+            const numBars = 30; // Number of bars in each barcode
+            const barWidth = 0.08;
+            const barGap = 0.01;
+            const barcodeSpacing = 0.15; // Space between maternal and paternal barcodes
             
-            // Create maternal chromosome strand (one color)
-            const maternalColor = 0xff6b9d; // Pink
-            const paternalColor = 0x4169e1; // Blue
+            // Four DNA base colors: Adenine (red), Thymine (green), Guanine (blue), Cytosine (yellow)
+            const baseColors = [
+                0xff4444, // A - Red
+                0x44ff44, // T - Green  
+                0x4444ff, // G - Blue
+                0xffff44  // C - Yellow
+            ];
             
-            const segments = 60;
+            const baseNames = ['A', 'T', 'G', 'C'];
             
-            // Maternal strand (left helix)
-            for (let i = 0; i < segments; i++) {
-                const t = i / segments;
-                const angle = t * Math.PI * 2 * turns;
-                const y = t * genomeHeight - genomeHeight / 2;
-                const x = Math.cos(angle) * helixRadius;
-                const z = Math.sin(angle) * helixRadius;
+            // Generate random genome sequence (in real use, this would come from actual genetic data)
+            function generateRandomGenome(length) {
+                const genome = [];
+                for (let i = 0; i < length; i++) {
+                    genome.push(Math.floor(Math.random() * 4));
+                }
+                return genome;
+            }
+            
+            const maternalGenome = generateRandomGenome(numBars);
+            const paternalGenome = generateRandomGenome(numBars);
+            
+            // Create maternal barcode (left)
+            const barHeight = barcodeHeight / numBars;
+            for (let i = 0; i < numBars; i++) {
+                const baseIndex = maternalGenome[i];
+                const color = baseColors[baseIndex];
                 
-                const sphereGeometry = new THREE.SphereGeometry(0.06, 8, 8);
-                const sphereMaterial = new THREE.MeshPhongMaterial({
-                    color: maternalColor,
-                    emissive: maternalColor,
+                const geometry = new THREE.BoxGeometry(barWidth, barHeight - barGap, 0.05);
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    emissive: color,
                     emissiveIntensity: 0.3
                 });
-                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-                sphere.position.set(x - 0.1, y, z);
-                genomeGroup.add(sphere);
+                
+                const bar = new THREE.Mesh(geometry, material);
+                bar.position.set(
+                    -barcodeSpacing / 2,
+                    i * barHeight - barcodeHeight / 2,
+                    0
+                );
+                genomeGroup.add(bar);
             }
             
-            // Paternal strand (right helix)
-            for (let i = 0; i < segments; i++) {
-                const t = i / segments;
-                const angle = t * Math.PI * 2 * turns + Math.PI; // Offset by 180 degrees
-                const y = t * genomeHeight - genomeHeight / 2;
-                const x = Math.cos(angle) * helixRadius;
-                const z = Math.sin(angle) * helixRadius;
+            // Create paternal barcode (right)
+            for (let i = 0; i < numBars; i++) {
+                const baseIndex = paternalGenome[i];
+                const color = baseColors[baseIndex];
                 
-                const sphereGeometry = new THREE.SphereGeometry(0.06, 8, 8);
-                const sphereMaterial = new THREE.MeshPhongMaterial({
-                    color: paternalColor,
-                    emissive: paternalColor,
+                const geometry = new THREE.BoxGeometry(barWidth, barHeight - barGap, 0.05);
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: color,
+                    emissive: color,
                     emissiveIntensity: 0.3
                 });
-                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-                sphere.position.set(x + 0.1, y, z);
-                genomeGroup.add(sphere);
+                
+                const bar = new THREE.Mesh(geometry, material);
+                bar.position.set(
+                    barcodeSpacing / 2,
+                    i * barHeight - barcodeHeight / 2,
+                    0
+                );
+                genomeGroup.add(bar);
             }
             
-            // Add connecting base pairs (rungs of the ladder)
-            for (let i = 0; i < 10; i++) {
-                const t = i / 10;
-                const angle1 = t * Math.PI * 2 * turns;
-                const angle2 = t * Math.PI * 2 * turns + Math.PI;
-                const y = t * genomeHeight - genomeHeight / 2;
-                
-                const x1 = Math.cos(angle1) * helixRadius - 0.1;
-                const z1 = Math.sin(angle1) * helixRadius;
-                const x2 = Math.cos(angle2) * helixRadius + 0.1;
-                const z2 = Math.sin(angle2) * helixRadius;
-                
-                const points = [
-                    new THREE.Vector3(x1, y, z1),
-                    new THREE.Vector3(x2, y, z2)
-                ];
-                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-                const lineMaterial = new THREE.LineBasicMaterial({
-                    color: 0xcccccc,
-                    transparent: true,
-                    opacity: 0.6
-                });
-                const line = new THREE.Line(lineGeometry, lineMaterial);
-                genomeGroup.add(line);
-            }
-            
-            // Add label
+            // Add label with color legend
             const labelCanvas = document.createElement('canvas');
-            labelCanvas.width = 256;
-            labelCanvas.height = 128;
+            labelCanvas.width = 320;
+            labelCanvas.height = 140;
             const ctx = labelCanvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 32px Arial';
-            ctx.textAlign = 'center';
             
-            let labelText = 'Diploid Genome';
-            if (motherId && fatherId) {
-                labelText = '♀ + ♂ = 2n';
-            }
-            ctx.fillText(labelText, 128, 50);
-            ctx.font = '20px Arial';
-            ctx.fillStyle = '#ff6b9d';
-            ctx.fillText('Maternal', 64, 80);
-            ctx.fillStyle = '#4169e1';
-            ctx.fillText('Paternal', 192, 80);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Diploid Genome (2n)', labelCanvas.width/2, 25);
+            
+            // Color legend for DNA bases
+            ctx.font = '16px Arial';
+            const legendY = 50;
+            const spacing = 70;
+            
+            // Draw legend boxes and labels
+            const legendColors = [
+                {color: '#ff4444', label: 'A', x: 20},
+                {color: '#44ff44', label: 'T', x: 20 + spacing},
+                {color: '#4444ff', label: 'G', x: 20 + spacing * 2},
+                {color: '#ffff44', label: 'C', x: 20 + spacing * 3}
+            ];
+            
+            legendColors.forEach(item => {
+                ctx.fillStyle = item.color;
+                ctx.fillRect(item.x, legendY, 15, 15);
+                ctx.fillStyle = '#000000';
+                ctx.fillText(item.label, item.x + 27, legendY + 12);
+            });
+            
+            ctx.font = '18px Arial';
+            ctx.fillStyle = '#ff1493';
+            ctx.fillText('♀ Maternal', labelCanvas.width/2 - 60, 95);
+            ctx.fillStyle = '#1e90ff';
+            ctx.fillText('♂ Paternal', labelCanvas.width/2 + 60, 95);
             
             const labelTexture = new THREE.CanvasTexture(labelCanvas);
             const labelMaterial = new THREE.SpriteMaterial({ 
@@ -901,8 +918,8 @@
                 opacity: 0.9
             });
             const labelSprite = new THREE.Sprite(labelMaterial);
-            labelSprite.scale.set(2, 1, 1);
-            labelSprite.position.set(0, genomeHeight / 2 + 0.8, 0);
+            labelSprite.scale.set(1.0, 0.45, 1);
+            labelSprite.position.set(0, barcodeHeight / 2 + 0.5, 0);
             genomeGroup.add(labelSprite);
             
             // Position the genome group
