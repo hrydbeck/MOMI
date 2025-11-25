@@ -4,11 +4,11 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const port = 3001; // Changed from 3000 (in use)
+const port = process.env.PORT || 3001;
 
-// MongoDB connection
-const url = 'mongodb://momi_user:momi_password@localhost:27019';
-const dbName = 'momi_db';
+// MongoDB connection - use environment variable for Railway/cloud deployment
+const url = process.env.MONGODB_URL || 'mongodb://momi_user:momi_password@localhost:27019';
+const dbName = process.env.MONGODB_DB || 'momi_db';
 const client = new MongoClient(url);
 
 // Middleware
