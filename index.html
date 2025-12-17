@@ -177,12 +177,293 @@
             margin: 3px 0;
             font-size: 12px;
         }
+        
+        /* Mount Improbable Menu Modal */
+        #mi-menu-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #mi-menu-modal.visible {
+            display: flex;
+        }
+        
+        .mi-menu-content {
+            background: linear-gradient(145deg, #1a2a4a 0%, #0a1525 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            border: 2px solid #00ffaa;
+            box-shadow: 0 0 30px rgba(0, 255, 170, 0.3);
+        }
+        
+        .mi-menu-content h2 {
+            color: #00ffaa;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .mi-menu-content p {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .mi-menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .mi-menu-btn.animation {
+            background: linear-gradient(135deg, #00ffaa 0%, #00cc88 100%);
+            color: #000;
+        }
+        
+        .mi-menu-btn.animation:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.5);
+        }
+        
+        .mi-menu-btn.wiki {
+            background: linear-gradient(135deg, #4169e1 0%, #2a4a9a 100%);
+            color: white;
+        }
+        
+        .mi-menu-btn.wiki:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(65, 105, 225, 0.5);
+        }
+        
+        .mi-menu-btn.close {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .mi-menu-btn.close:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        
+        /* Animation Modal */
+        #mi-animation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 3000;
+        }
+        
+        #mi-animation-modal.visible {
+            display: block;
+        }
+        
+        #mi-animation-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #mi-animation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        #mi-animation-title {
+            position: absolute;
+            bottom: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 2s;
+            color: white;
+            z-index: 10;
+        }
+        
+        #mi-animation-title.visible {
+            opacity: 1;
+        }
+        
+        #mi-animation-title h1 {
+            font-size: 36px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+            color: #00ffaa;
+        }
+        
+        #mi-animation-title h2 {
+            font-size: 16px;
+            font-weight: 300;
+            color: #ffaa00;
+        }
+        
+        #mi-narration {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 900px;
+            text-align: center;
+            font-size: 22px;
+            line-height: 1.7;
+            opacity: 0;
+            transition: opacity 0.8s;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 1);
+            background: rgba(0, 0, 0, 0.75);
+            padding: 25px 40px;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 255, 170, 0.3);
+            color: white;
+        }
+        
+        #mi-narration.visible {
+            opacity: 1;
+        }
+        
+        #mi-timeline-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffaa00;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid #ffaa00;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        #mi-close-animation {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 20;
+            pointer-events: all;
+        }
+        
+        #mi-close-animation:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        
+        #mi-animation-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 10px;
+            pointer-events: all;
+            max-width: 280px;
+        }
+        
+        #mi-animation-controls button {
+            background: #00ffaa;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        #mi-animation-controls button:hover {
+            background: #00dd99;
+        }
+        
+        #mi-animation-controls button.epoch-btn {
+            background: #4466aa;
+            color: white;
+            font-size: 10px;
+            padding: 6px 8px;
+        }
+        
+        #mi-animation-controls button.epoch-btn:hover {
+            background: #5577bb;
+        }
+        
+        #mi-speed-control {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        #mi-speed-control label {
+            color: #00ffaa;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        #mi-speed-slider {
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        #mi-speed-value {
+            color: #ffaa00;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .mi-nav-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #444;
+        }
+        
+        .mi-nav-section h4 {
+            color: #ffaa00;
+            font-size: 11px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
     <div id="container">
         <div id="canvas-container">
-            <div id="title-overlay"><a href="https://en.wikipedia.org/wiki/Climbing_Mount_Improbable" target="_blank">Mount Improbable</a></div>
+            <div id="title-overlay"><span id="mi-title-link" style="cursor: pointer;">Mount Improbable</span></div>
             <div id="loading">Loading 3D Visualization...</div>
             
             <!-- View Mode Indicator -->
@@ -257,35 +538,98 @@
             </div>
 
             <button id="reset-camera">Reset Camera View</button>
-            <button id="toggle-perspective" style="background: #ff6b35; margin-top: 5px;">Disable Perspective</button>
+            <button id="toggle-perspective" style="background: #4CAF50; margin-top: 5px;">Enable Perspective</button>
             <button id="toggle-life-events" style="background: #9c27b0; margin-top: 5px;">Hide Life Events</button>
             <button id="toggle-genomes" style="background: #2196f3; margin-top: 5px;">Show Diploid Genomes</button>
             <button id="toggle-environment" style="background: #8bc34a; margin-top: 5px;">Show Environment View</button>
+            <button id="toggle-cell-types" style="background: #e91e63; margin-top: 5px;">Show Cell Types</button>
 
-            <h2>Family Selection</h2>
+            <h2>Import / Export</h2>
             <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;">
-                <button id="select-all" style="background: #4CAF50;">Show All Families</button>
-                <button id="select-smith">Focus Smith Family</button>
-                <button id="select-chen">Focus Chen Family</button>
+                <button id="clear-pedigree-btn" style="background: #f44336;">🗑️ Clear Pedigree</button>
+                <input type="file" id="import-momi" accept=".momi,.zip" style="display: none;">
+                <button id="import-momi-btn" style="background: #2196f3;">📥 Import Pedigree (.momi)</button>
+                <button id="export-momi-btn" style="background: #4CAF50;">📤 Export Pedigree (.momi)</button>
+            </div>
+            <div class="info" style="font-size: 11px;">
+                <strong>.momi format:</strong> A zip file containing both pedigree.ped and life_events.tsv<br>
+                <em>This ensures all data is imported/exported together</em>
             </div>
 
             <div id="family-info"></div>
             <div id="person-details"></div>
 
-            <h2>Families</h2>
-            <div class="info">
-                <strong>2 Families, 3 Generations Each:</strong><br>
-                • Smith Family (left, 9 members)<br>
-                • Chen Family (right, 8 members)<br>
-                • Shows evolutionary progression<br>
-                • All births biologically spaced (9+ months)<br>
-                <em>Click buttons to focus, or click gestation stacks for trimester info</em>
+            <h2>Pedigree Info</h2>
+            <div id="pedigree-info" class="info">
+                <strong>No pedigree loaded</strong><br>
+                Import a .ped file to visualize your family tree.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mount Improbable Menu Modal -->
+    <div id="mi-menu-modal">
+        <div class="mi-menu-content">
+            <h2>Mount Improbable</h2>
+            <p>Learn about the metaphor that powers this visualization</p>
+            <button class="mi-menu-btn animation" onclick="showMIAnimation()">
+                🎬 Watch the Animation
+            </button>
+            <button class="mi-menu-btn wiki" onclick="window.open('https://en.wikipedia.org/wiki/Climbing_Mount_Improbable', '_blank'); closeMIMenu();">
+                📖 Read on Wikipedia
+            </button>
+            <button class="mi-menu-btn close" onclick="closeMIMenu()">
+                Close
+            </button>
+        </div>
+    </div>
+    
+    <!-- Mount Improbable Animation Modal -->
+    <div id="mi-animation-modal">
+        <div id="mi-animation-container"></div>
+        <div id="mi-animation-overlay">
+            <div id="mi-animation-title">
+                <h1>MOUNT IMPROBABLE</h1>
+                <h2>3.8 Billion Years of Life on Earth</h2>
+            </div>
+            <div id="mi-narration"></div>
+            <div id="mi-timeline-display">Present Day</div>
+            <button id="mi-close-animation" onclick="closeMIAnimation()">✕ Close</button>
+            <div id="mi-animation-controls">
+                <button onclick="miAnimationRestart()">↻ Restart</button>
+                <button onclick="miAnimationToggle()" id="mi-play-btn">⏸ Pause</button>
+                
+                <div id="mi-speed-control">
+                    <label>⚡ Speed: <span id="mi-speed-value">1x</span></label>
+                    <input type="range" id="mi-speed-slider" min="0.1" max="5" step="0.1" value="1" 
+                           onchange="setMISpeed(this.value)" oninput="updateSpeedDisplay(this.value)">
+                </div>
+                
+                <div class="mi-nav-section">
+                    <h4>🕐 Jump to Era</h4>
+                    <button class="epoch-btn" onclick="jumpToEpoch(0)">Present</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-13)">K-Pg (66Ma)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-40)">Triassic (200Ma)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-108)">Cambrian (541Ma)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-120)">🧬 Sex (1.2Ga)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-240)">Eukaryotes (2.1Ga)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-380)">🔬 Origin of Life</button>
+                </div>
+                
+                <div class="mi-nav-section">
+                    <h4>💀 Mass Extinctions</h4>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-13)">K-Pg (Dinos)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-50)">Permian (252Ma)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-72)">Devonian (375Ma)</button>
+                    <button class="epoch-btn" onclick="jumpToEpoch(-86)">Ordovician (445Ma)</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
 
@@ -299,7 +643,7 @@
         // Evolutionary perspective - fictional origin point for visualization
         const ORIGIN_YEAR = OLDEST_YEAR - 20; // 20 years before oldest person (1910)
         const VANISHING_POINT = { x: 0, z: 0 }; // All lineages converge here
-        let perspectiveEnabled = true; // Toggle for perspective view
+        let perspectiveEnabled = false; // Toggle for perspective view (disabled by default)
         let lifeEventsVisible = true; // Toggle for life events visibility
 
         // Scene setup
@@ -313,6 +657,24 @@
         let genomesVisible = false; // Toggle for genome visibility
         let genomeLegend = null; // Store reference to genome legend sprite
         let environmentView = false; // Toggle for environment vs individual view
+        
+        // Cell type visualization
+        const cellTypeVisualizations = []; // Store cell type substacks
+        let cellTypesVisible = false; // Toggle for cell types visibility
+        
+        // Cell type definitions - uses shade multipliers applied to person's base color
+        // Germline is included as a special cell type (the reproductive lineage)
+        const CELL_TYPES = [
+            { name: 'Epithelial', shadeMultiplier: 1.0 },    // Base color
+            { name: 'Muscle', shadeMultiplier: 0.7 },        // Darker
+            { name: 'Nerve', shadeMultiplier: 1.3 },         // Lighter
+            { name: 'Blood', shadeMultiplier: 0.85 },        // Slightly darker
+            { name: 'Bone', shadeMultiplier: 1.5 },          // Much lighter
+            { name: 'Adipose', shadeMultiplier: 1.15 },      // Slightly lighter
+            { name: 'Connective', shadeMultiplier: 0.55 },   // Much darker
+            { name: 'Immune', shadeMultiplier: 0.9 },        // Slightly darker
+            { name: 'Germline', shadeMultiplier: 1.0, isGermline: true }  // Special - reproductive cells
+        ];
         
         // Family member IDs (populated from API)
         let familyMembers = {};
@@ -424,10 +786,14 @@
             document.getElementById('toggle-genomes').addEventListener('click', toggleGenomes);
             document.getElementById('toggle-environment').addEventListener('click', toggleEnvironment);
             
-            // Family selection buttons
-            document.getElementById('select-all').addEventListener('click', () => selectFamily(null));
-            document.getElementById('select-smith').addEventListener('click', () => selectFamily('smith'));
-            document.getElementById('select-chen').addEventListener('click', () => selectFamily('chen'));
+            // Cell types toggle button
+            document.getElementById('toggle-cell-types').addEventListener('click', toggleCellTypes);
+            
+            // Import/Export buttons
+            document.getElementById('clear-pedigree-btn').addEventListener('click', clearPedigree);
+            document.getElementById('import-momi-btn').addEventListener('click', () => document.getElementById('import-momi').click());
+            document.getElementById('import-momi').addEventListener('change', handleMomiImport);
+            document.getElementById('export-momi-btn').addEventListener('click', exportMomiFile);
             
             // Mouse move for hover tooltips
             renderer.domElement.addEventListener('mousemove', onMouseMove);
@@ -499,20 +865,25 @@
             edges.position.y = presentHeight;
             scene.add(edges);
             
-            // Add "BIOSPHERE, NOW" label
+            // Add "ORIGIN OF LIFE" label at the far end (bottom of mountain)
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
             canvas.width = 512;
             canvas.height = 128;
-            context.fillStyle = '#00ffff';
+            context.fillStyle = '#ffffff';
             context.font = 'Bold 48px Arial';
             context.textAlign = 'center';
-            context.fillText('BIOSPHERE, NOW', 256, 80);
+            context.fillText('ORIGIN OF LIFE', 256, 60);
+            context.font = '24px Arial';
+            context.fillStyle = '#00ffaa';
+            context.fillText('3.8 Billion Years Ago', 256, 100);
 
             const texture = new THREE.CanvasTexture(canvas);
             const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
             const sprite = new THREE.Sprite(spriteMaterial);
-            sprite.position.set(0, presentHeight + 0.5, 0);
+            // Position at far end - origin of life (using perspective origin point)
+            const originHeight = (ORIGIN_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            sprite.position.set(0, originHeight - 2, 0);
             sprite.scale.set(6, 1.5, 1);
             scene.add(sprite);
         }
@@ -830,6 +1201,11 @@
             if (!environmentView) {
                 addDiploidGenomeVisualization(id, centerPos, height, sex, motherId, data.fatherId);
             }
+            
+            // Create cell type visualization (only in individual view, hidden by default)
+            if (!environmentView) {
+                addCellTypeVisualization(id, centerPos, height, mesh.rotation, birthDecimal, deathOrCurrentYear, x, z, sex);
+            }
 
             return mesh;
         }
@@ -1005,6 +1381,122 @@
             console.log('Legend added to scene, total children:', scene.children.length);
         }
         
+        function addCellTypeVisualization(personId, centerPos, height, rotation, birthDecimal, deathOrCurrentYear, x, z, sex) {
+            // Create cell type substacks arranged in a grid in the X-Z plane
+            // Uses shades of the person's base color (pink for female, blue for male)
+            const cellTypeGroup = new THREE.Group();
+            
+            // Base color based on sex
+            const baseColor = sex === 'F' ? new THREE.Color(0xff69b4) : new THREE.Color(0x4169e1);
+            
+            // Grid layout: 3 columns (X) x 3 rows (Z) = 9 cell types
+            const gridCols = 3;
+            const gridRows = 3;
+            const numCellTypes = CELL_TYPES.length; // 9 including germline
+            
+            const totalWidth = PERSON_WIDTH * 0.9;  // Use 90% of person width
+            const totalDepth = PERSON_DEPTH * 0.9;  // Use 90% of person depth
+            const cellWidth = totalWidth / gridCols;
+            const cellDepth = totalDepth / gridRows;
+            const barHeight = height;
+            
+            // Helper function to apply shade multiplier to a color
+            function applyShade(color, multiplier) {
+                const hsl = {};
+                color.getHSL(hsl);
+                // Adjust lightness based on multiplier
+                const newLightness = Math.min(1, Math.max(0, hsl.l * multiplier));
+                return new THREE.Color().setHSL(hsl.h, hsl.s, newLightness);
+            }
+            
+            for (let i = 0; i < numCellTypes; i++) {
+                const cellType = CELL_TYPES[i];
+                const col = i % gridCols;
+                const row = Math.floor(i / gridCols);
+                
+                // Calculate position in grid
+                const xOffset = -totalWidth / 2 + cellWidth / 2 + col * cellWidth;
+                const zOffset = -totalDepth / 2 + cellDepth / 2 + row * cellDepth;
+                
+                // Create box geometry for this cell type
+                const barGeometry = new THREE.BoxGeometry(
+                    cellWidth * 0.9,  // Slight gap between cells
+                    barHeight,
+                    cellDepth * 0.9
+                );
+                
+                // Determine color - germline is special (orange/gold), others use shade of base
+                let cellColor;
+                let emissiveColor = null;
+                let emissiveIntensity = 0;
+                
+                if (cellType.isGermline) {
+                    // Germline uses distinctive orange/gold color with glow
+                    cellColor = new THREE.Color(0xffaa00);
+                    emissiveColor = new THREE.Color(0xffaa00);
+                    emissiveIntensity = 0.3;
+                } else {
+                    // Apply shade multiplier to base color
+                    cellColor = applyShade(baseColor.clone(), cellType.shadeMultiplier);
+                }
+                
+                const barMaterial = new THREE.MeshPhongMaterial({
+                    color: cellColor,
+                    transparent: true,
+                    opacity: 0.75,
+                    shininess: 30,
+                    depthWrite: false
+                });
+                
+                if (emissiveColor) {
+                    barMaterial.emissive = emissiveColor;
+                    barMaterial.emissiveIntensity = emissiveIntensity;
+                }
+                
+                const bar = new THREE.Mesh(barGeometry, barMaterial);
+                
+                // Position in grid
+                bar.position.set(xOffset, 0, zOffset);
+                
+                bar.userData = {
+                    isCellType: true,
+                    cellTypeName: cellType.name,
+                    personId: personId,
+                    isGermline: cellType.isGermline || false
+                };
+                
+                cellTypeGroup.add(bar);
+            }
+            
+            // Position and rotate the group to match the person
+            cellTypeGroup.position.copy(centerPos);
+            cellTypeGroup.rotation.copy(rotation);
+            
+            cellTypeGroup.visible = cellTypesVisible;
+            cellTypeGroup.userData = {
+                isCellTypeGroup: true,
+                personId: personId
+            };
+            cellTypeGroup.renderOrder = 5; // Render on top of person mesh
+            
+            scene.add(cellTypeGroup);
+            cellTypeVisualizations.push(cellTypeGroup);
+        }
+        
+        function toggleCellTypes() {
+            cellTypesVisible = !cellTypesVisible;
+            
+            // Update button text
+            const button = document.getElementById('toggle-cell-types');
+            button.textContent = cellTypesVisible ? 'Hide Cell Types' : 'Show Cell Types';
+            button.style.background = cellTypesVisible ? '#e91e63' : '#4CAF50';
+            
+            // Toggle visibility of all cell type visualizations
+            cellTypeVisualizations.forEach(group => {
+                group.visible = cellTypesVisible;
+            });
+        }
+
         function addLifeEventsMarkers(personId, x, z, birthDecimal, topYear, birthHeight, personHeight, centerPos, rotation) {
             // Get all life events for this person
             const personEvents = lifeEvents.filter(event => event.personId === personId);
@@ -1141,10 +1633,12 @@
                     color: childColor,
                     transparent: true,
                     opacity: 0.5,
-                    shininess: 20
+                    shininess: 20,
+                    depthWrite: false
                 });
                 
                 const segment = new THREE.Mesh(segmentGeom, segmentMaterial);
+                segment.renderOrder = 10; // Render on top of mother's mesh
                 
                 const segmentBottomPerspective = applyPerspective(
                     mother.userData.x || mother.position.x, 
@@ -1265,6 +1759,7 @@
             const sprite = new THREE.Sprite(spriteMaterial);
             sprite.position.set(x, y, z);
             sprite.scale.set(1.5, 0.375, 1);
+            sprite.userData = { isNameLabel: true, labelText: text };
             scene.add(sprite);
         }
 
@@ -1385,59 +1880,116 @@
         // API configuration
         const API_BASE_URL = 'https://momi-production.up.railway.app/api';
 
-        // Load data from MongoDB API
+        // Default sample pedigree data (matching sample_pedigree.ped)
+        const SAMPLE_PEDIGREE = `# FamilyID	IndivID	FatherID	MotherID	Sex	Name
+# Paternal grandparents
+DEMO	PGF	0	0	1	Grandpa Erik
+DEMO	PGM	0	0	2	Grandma Anna
+# Maternal grandparents
+DEMO	MGF	0	0	1	Grandpa Lars
+DEMO	MGM	0	0	2	Grandma Karin
+# Parents
+DEMO	FATHER	PGF	PGM	1	Father Johan
+DEMO	MOTHER	MGF	MGM	2	Mother Maria
+# Children
+DEMO	SON	FATHER	MOTHER	1	Son Anders
+DEMO	DAUGHTER	FATHER	MOTHER	2	Daughter Elsa`;
+
+        // Load default sample pedigree
         async function loadDataFromAPI() {
             try {
-                document.getElementById('loading').innerHTML = 'Loading family data...';
+                document.getElementById('loading').innerHTML = 'Loading sample pedigree...';
                 
-                // Fetch all data in parallel
-                const [personsResponse, conceptionsResponse, familiesResponse, lifeEventsResponse] = await Promise.all([
-                    fetch(`${API_BASE_URL}/persons`),
-                    fetch(`${API_BASE_URL}/conceptions`),
-                    fetch(`${API_BASE_URL}/families`),
-                    fetch(`${API_BASE_URL}/lifeEvents`)
-                ]);
-
-                if (!personsResponse.ok || !conceptionsResponse.ok || !familiesResponse.ok || !lifeEventsResponse.ok) {
-                    throw new Error('Failed to fetch data from API');
-                }
-
-                const persons = await personsResponse.json();
-                const conceptionsData = await conceptionsResponse.json();
-                families = await familiesResponse.json();
-                lifeEvents = await lifeEventsResponse.json();
-
-                // Transform MongoDB data to visualization format
-                familyData = persons.map(person => ({
-                    id: person.id,
-                    name: person.name,
-                    sex: person.sex === 'male' ? 'M' : 'F',
-                    birthYear: person.birthYear,
-                    birthMonth: person.birthMonth,
-                    deathYear: person.deathYear,
-                    motherId: person.motherId,
-                    fatherId: person.fatherId,
-                    x: person.x || 0,
-                    z: person.z || 0
-                }));
-
-                // Transform conceptions data
-                conceptions = conceptionsData.map(c => ({
-                    father: c.fatherId,
-                    mother: c.motherId,
-                    child: c.childId
-                }));
-
-                console.log(`Loaded ${familyData.length} persons, ${conceptions.length} conceptions, ${families.length} families, ${lifeEvents.length} life events from API`);
-                return true;
+                // Parse the sample pedigree directly
+                return loadSamplePedigree();
             } catch (error) {
-                console.error('Error loading data from API:', error);
+                console.error('Error loading sample pedigree:', error);
                 document.getElementById('loading').innerHTML = 
-                    'Error loading data from API. Make sure the server is running on port 3001.<br><br>' + 
-                    error.message + '<br><br>Run: npm start';
+                    'Error loading pedigree: ' + error.message;
                 document.getElementById('loading').style.background = 'rgba(255, 100, 0, 0.8)';
                 return false;
             }
+        }
+        
+        // Parse and load the built-in sample pedigree
+        function loadSamplePedigree() {
+            const lines = SAMPLE_PEDIGREE.trim().split('\n');
+            
+            // Clear existing data
+            familyData = [];
+            conceptions = [];
+            families = [];
+            lifeEvents = [];
+            familyMembers = {};
+            
+            const newPersons = [];
+            const familySet = new Set();
+            
+            lines.forEach((line) => {
+                const trimmedLine = line.trim();
+                
+                // Skip empty lines and comments
+                if (!trimmedLine || trimmedLine.startsWith('#')) return;
+                
+                const parts = trimmedLine.split(/\t|\s+/);
+                if (parts.length < 6) return;
+                
+                const [familyId, indivId, fatherId, motherId, sex, ...nameParts] = parts;
+                
+                let name = nameParts.join(' ') || indivId;
+                
+                familySet.add(familyId);
+                
+                const person = {
+                    id: indivId,
+                    name: name,
+                    sex: sex === '1' ? 'M' : 'F',
+                    birthYear: null,
+                    birthMonth: 6,
+                    deathYear: null,
+                    motherId: motherId === '0' ? null : motherId,
+                    fatherId: fatherId === '0' ? null : fatherId,
+                    familyId: familyId,
+                    x: 0,
+                    z: 0
+                };
+                
+                newPersons.push(person);
+            });
+            
+            // Build family members map
+            familySet.forEach(fam => {
+                familyMembers[fam] = newPersons.filter(p => p.familyId === fam).map(p => p.id);
+            });
+            
+            // Assign default birth years based on generation
+            assignDefaultBirthYears(newPersons);
+            
+            // Auto-calculate positions
+            assignPositions(newPersons);
+            
+            // Build conceptions array
+            newPersons.forEach(person => {
+                if (person.motherId && person.fatherId) {
+                    conceptions.push({
+                        father: person.fatherId,
+                        mother: person.motherId,
+                        child: person.id
+                    });
+                }
+            });
+            
+            // Update global data
+            familyData = newPersons;
+            
+            families = Array.from(familySet).map(fam => ({
+                id: fam,
+                name: fam,
+                members: familyMembers[fam]
+            }));
+            
+            console.log(`Loaded sample pedigree with ${familyData.length} persons`);
+            return true;
         }
 
         function createFamily() {
@@ -1498,6 +2050,7 @@
                     opacity: 0.3 + (progress * 0.2)
                 });
                 const contourLine = new THREE.Line(contourGeometry, contourMaterial);
+                contourLine.userData = { isPerspectiveGuide: true };
                 scene.add(contourLine);
                 
                 // Add elevation markers
@@ -1525,6 +2078,7 @@
                     const marker = new THREE.Sprite(markerMaterial);
                     marker.position.set(markerPos.x, contourHeight, markerPos.z);
                     marker.scale.set(3, 0.75, 1);
+                    marker.userData = { isPerspectiveGuide: true };
                     scene.add(marker);
                 }
             }
@@ -1560,6 +2114,7 @@
                 
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
                 const line = new THREE.Line(geometry, lineMaterial);
+                line.userData = { isPerspectiveGuide: true };
                 scene.add(line);
             });
             
@@ -1574,11 +2129,13 @@
             });
             const originMarker = new THREE.Mesh(originGeometry, originMaterial);
             originMarker.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
+            originMarker.userData = { isPerspectiveGuide: true };
             scene.add(originMarker);
             
             // Add pulsing point light at origin (small but intense)
             const originLight = new THREE.PointLight(0xffaa00, 3, 8);
             originLight.position.set(VANISHING_POINT.x, originHeight, VANISHING_POINT.z);
+            originLight.userData = { isPerspectiveGuide: true };
             scene.add(originLight);
             
             // Animate the light to pulse (more dramatic for distant point)
@@ -1597,6 +2154,7 @@
             gridHelper.position.y = originHeight - 0.1;
             gridHelper.material.transparent = true;
             gridHelper.material.opacity = 0.1;
+            gridHelper.userData = { isPerspectiveGuide: true };
             scene.add(gridHelper);
             
             // Add clear text label for origin point
@@ -1630,6 +2188,7 @@
             const label = new THREE.Mesh(originLabelGeometry, labelMaterial);
             label.position.set(0, originHeight - 1.5, 0);
             label.rotation.x = -Math.PI / 2;
+            label.userData = { isPerspectiveGuide: true };
             scene.add(label);
         }
 
@@ -2141,6 +2700,7 @@
             conceptionLines.length = 0;
             lifeEventMarkers.length = 0;
             genomeVisualizations.length = 0;
+            cellTypeVisualizations.length = 0;
             if (genomeLegend) {
                 scene.remove(genomeLegend);
                 genomeLegend = null;
@@ -2222,6 +2782,7 @@
                 // Hide genome toggle button
                 document.getElementById('toggle-genomes').style.display = 'none';
                 document.getElementById('toggle-life-events').style.display = 'none';
+                document.getElementById('toggle-cell-types').style.display = 'none';
                 
                 // Hide all existing life event markers
                 lifeEventMarkers.forEach(marker => {
@@ -2231,6 +2792,7 @@
                 // Restore buttons
                 document.getElementById('toggle-genomes').style.display = 'block';
                 document.getElementById('toggle-life-events').style.display = 'block';
+                document.getElementById('toggle-cell-types').style.display = 'block';
                 
                 // Restore genome legend if genomes were visible
                 if (genomesVisible) {
@@ -2263,19 +2825,61 @@
             const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
 
+            // Create tooltip if it doesn't exist
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'event-tooltip';
+                document.body.appendChild(tooltip);
+            }
+
+            // Check for cell type meshes first (if visible)
+            if (cellTypesVisible) {
+                const cellTypeObjects = [];
+                cellTypeVisualizations.forEach(group => {
+                    if (group.visible) {
+                        group.children.forEach(child => {
+                            if (child.userData.isCellType) {
+                                cellTypeObjects.push(child);
+                            }
+                        });
+                    }
+                });
+                
+                const cellTypeIntersects = raycaster.intersectObjects(cellTypeObjects);
+                
+                if (cellTypeIntersects.length > 0) {
+                    const cellData = cellTypeIntersects[0].object.userData;
+                    
+                    // Get person name from personMeshes
+                    const personMesh = personMeshes.get(cellData.personId);
+                    const personName = personMesh ? personMesh.userData.name : 'Unknown';
+                    
+                    const isGermline = cellData.isGermline;
+                    const borderColor = isGermline ? '#ffaa00' : '#888';
+                    const bgColor = isGermline ? 'rgba(255, 170, 0, 0.15)' : 'rgba(0, 0, 0, 0.9)';
+                    
+                    tooltip.innerHTML = `
+                        <div style="border-left: 3px solid ${borderColor}; padding-left: 8px; background: ${bgColor}; margin: -10px -15px; padding: 10px 15px;">
+                            <h4 style="color: ${isGermline ? '#ffaa00' : '#fff'}; margin: 0 0 5px 0;">${cellData.cellTypeName}</h4>
+                            <p style="margin: 2px 0; font-size: 11px; color: #aaa;">Person: ${personName}</p>
+                            ${isGermline ? '<p style="margin: 5px 0 0 0; font-size: 10px; color: #ffcc66; font-style: italic;">Reproductive cells (eggs/sperm)</p>' : ''}
+                        </div>
+                    `;
+                    
+                    tooltip.style.left = (event.clientX + 15) + 'px';
+                    tooltip.style.top = (event.clientY + 15) + 'px';
+                    tooltip.style.display = 'block';
+                    tooltip.style.border = isGermline ? '2px solid #ffaa00' : '2px solid #ffaa00';
+                    return; // Don't check other objects
+                }
+            }
+
             // Check for life event markers
             const visibleMarkers = lifeEventMarkers.filter(m => m.visible && m.userData.isLifeEvent);
             const intersects = raycaster.intersectObjects(visibleMarkers);
 
             if (intersects.length > 0 && intersects[0].object.userData.isLifeEvent) {
                 const eventData = intersects[0].object.userData.event;
-                
-                // Create or update tooltip
-                if (!tooltip) {
-                    tooltip = document.createElement('div');
-                    tooltip.className = 'event-tooltip';
-                    document.body.appendChild(tooltip);
-                }
                 
                 const severityColors = {
                     'severe': '#ff0000',
@@ -2296,12 +2900,913 @@
                 tooltip.style.top = (event.clientY + 15) + 'px';
                 tooltip.style.display = 'block';
             } else {
-                // Remove tooltip
-                if (tooltip) {
-                    tooltip.style.display = 'none';
+                // Hide tooltip
+                tooltip.style.display = 'none';
+            }
+        }
+
+        // ============ IMPORT/EXPORT FUNCTIONS ============
+        
+        // Clear pedigree - user-triggered clear
+        function clearPedigree() {
+            clearScene();
+            familyData = [];
+            conceptions = [];
+            families = [];
+            lifeEvents = [];
+            familyMembers = {};
+            updatePedigreeInfo();
+            console.log('Pedigree cleared');
+        }
+        
+        // Clear the current scene of all person meshes and related objects
+        function clearScene() {
+            // Collect all objects to remove - be aggressive, keep only essential static elements
+            const objectsToRemove = [];
+            
+            // Get the present grid height for identification
+            const presentHeight = (CURRENT_YEAR - OLDEST_YEAR) * YEAR_SCALE;
+            
+            // Time axis base position
+            const axisBaseX = -6;
+            const axisBaseZ = -6;
+            
+            scene.traverse(obj => {
+                // Skip the root scene
+                if (obj === scene) return;
+                
+                // Skip cameras
+                if (obj.isCamera) return;
+                
+                // Skip ambient and directional lights (main scene lighting)
+                if (obj.isAmbientLight || obj.isDirectionalLight) return;
+                
+                // Skip axes helper (RGB axes at origin)
+                if (obj.isAxesHelper) return;
+                
+                // Skip the present-level grid (green grid at y = presentHeight)
+                if (obj.isGridHelper && Math.abs(obj.position.y - presentHeight) < 0.5) return;
+                
+                // Skip the green "BIOSPHERE, NOW" plane and its edges at present height
+                if (obj.isMesh && obj.position && Math.abs(obj.position.y - presentHeight) < 0.5 && 
+                    obj.geometry && obj.geometry.type === 'PlaneGeometry') return;
+                if (obj.isLineSegments && obj.position && Math.abs(obj.position.y - presentHeight) < 0.5) return;
+                
+                // Skip time axis elements (white lines and labels near x=-6, z=-6)
+                if (obj.isLine && obj.material && obj.material.color) {
+                    const color = obj.material.color;
+                    // White lines are time axis (color is 0xffffff = r:1, g:1, b:1)
+                    if (color.r === 1 && color.g === 1 && color.b === 1) {
+                        return; // Keep white axis lines
+                    }
+                }
+                
+                // Skip year label sprites (white text sprites near the time axis at x < -5)
+                if (obj.isSprite && obj.position) {
+                    const pos = obj.position;
+                    // Year labels are positioned at x < -5 (near the time axis)
+                    if (pos.x < -5) {
+                        return; // Keep year labels
+                    }
+                    // X axis label at (8, 0, 0)
+                    if (Math.abs(pos.y) < 0.5 && Math.abs(pos.x - 8) < 1 && Math.abs(pos.z) < 1) {
+                        return;
+                    }
+                    // Z axis label at (0, 0, 8)
+                    if (Math.abs(pos.y) < 0.5 && Math.abs(pos.x) < 1 && Math.abs(pos.z - 8) < 1) {
+                        return;
+                    }
+                    // Y/NOW label at top center
+                    if (Math.abs(pos.y - presentHeight - 1) < 1.5 && Math.abs(pos.x) < 1 && Math.abs(pos.z) < 1) {
+                        return;
+                    }
+                    // BIOSPHERE NOW label at presentHeight + 0.5
+                    if (Math.abs(pos.y - presentHeight - 0.5) < 0.5 && Math.abs(pos.x) < 1 && Math.abs(pos.z) < 1) {
+                        return;
+                    }
+                }
+                
+                // Remove everything else
+                objectsToRemove.push(obj);
+            });
+            
+            // Remove collected objects
+            objectsToRemove.forEach(obj => {
+                scene.remove(obj);
+                if (obj.geometry) obj.geometry.dispose();
+                if (obj.material) {
+                    if (Array.isArray(obj.material)) {
+                        obj.material.forEach(m => m.dispose());
+                    } else {
+                        obj.material.dispose();
+                    }
+                }
+            });
+            
+            // Clear tracking arrays and maps
+            personMeshes.clear();
+            conceptionLines.length = 0;
+            lifeEventMarkers.length = 0;
+            genomeVisualizations.length = 0;
+            cellTypeVisualizations.length = 0;
+            
+            console.log(`Cleared ${objectsToRemove.length} objects from scene`);
+        }
+        
+        // Update pedigree info display
+        function updatePedigreeInfo() {
+            const infoDiv = document.getElementById('pedigree-info');
+            if (familyData.length === 0) {
+                infoDiv.innerHTML = `
+                    <strong>No pedigree loaded</strong><br>
+                    Import a .ped file to visualize your family tree.
+                `;
+                return;
+            }
+            
+            const numPersons = familyData.length;
+            const males = familyData.filter(p => p.sex === 'M').length;
+            const females = familyData.filter(p => p.sex === 'F').length;
+            const living = familyData.filter(p => !p.deathYear).length;
+            const deceased = familyData.filter(p => p.deathYear).length;
+            const eventCount = lifeEvents.length;
+            
+            // Calculate generations (rough estimate based on parent chains)
+            const generations = calculateGenerations();
+            
+            infoDiv.innerHTML = `
+                <strong>Pedigree Loaded</strong><br>
+                • Individuals: ${numPersons} (${males}♂ / ${females}♀)<br>
+                • Status: ${living} living, ${deceased} deceased<br>
+                • Generations: ~${generations}<br>
+                • Life Events: ${eventCount}
+            `;
+        }
+        
+        // Calculate number of generations in the pedigree
+        function calculateGenerations() {
+            if (familyData.length === 0) return 0;
+            
+            // Find roots (people with no parents in the data)
+            const hasParentInData = id => familyData.some(p => p.id === id);
+            const roots = familyData.filter(p => 
+                (!p.motherId || !hasParentInData(p.motherId)) && 
+                (!p.fatherId || !hasParentInData(p.fatherId))
+            );
+            
+            // BFS to find max depth
+            let maxDepth = 1;
+            const visited = new Set();
+            const queue = roots.map(r => ({ id: r.id, depth: 1 }));
+            
+            while (queue.length > 0) {
+                const { id, depth } = queue.shift();
+                if (visited.has(id)) continue;
+                visited.add(id);
+                
+                maxDepth = Math.max(maxDepth, depth);
+                
+                // Find children
+                familyData.filter(p => p.motherId === id || p.fatherId === id)
+                    .forEach(child => queue.push({ id: child.id, depth: depth + 1 }));
+            }
+            
+            return maxDepth;
+        }
+        
+        // Handle .ped file import (and optionally .tsv if selected together)
+        async function handlePedImport(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            // Separate PED and TSV files
+            const pedFile = files.find(f => f.name.toLowerCase().endsWith('.ped'));
+            const tsvFile = files.find(f => f.name.toLowerCase().endsWith('.tsv'));
+            
+            if (!pedFile) {
+                // If only TSV selected, treat as TSV import
+                if (tsvFile) {
+                    await processTsvFile(tsvFile);
+                    event.target.value = '';
+                    return;
+                }
+                alert('Please select a .ped file');
+                return;
+            }
+            
+            try {
+                const text = await pedFile.text();
+                const lines = text.trim().split('\n');
+                
+                // Clear existing data
+                clearScene();
+                familyData = [];
+                conceptions = [];
+                families = [];
+                lifeEvents = [];
+                familyMembers = {};
+                
+                // Parse .ped file
+                // Format: FamilyID IndivID FatherID MotherID Sex Name [x] [z]
+                // Sex: 1 = male, 2 = female
+                const newPersons = [];
+                const familySet = new Set();
+                
+                lines.forEach((line, index) => {
+                    const trimmedLine = line.trim();
+                    
+                    // Skip empty lines and comments
+                    if (!trimmedLine || trimmedLine.startsWith('#')) return;
+                    
+                    const parts = trimmedLine.split(/\t|\s+/);
+                    if (parts.length < 6) return; // Skip invalid lines
+                    
+                    const [familyId, indivId, fatherId, motherId, sex, ...nameParts] = parts;
+                    
+                    // Handle name (may contain spaces)
+                    let name = nameParts[0] || indivId;
+                    let x = 0, z = 0;
+                    
+                    // Check if last parts are coordinates
+                    if (nameParts.length >= 3 && !isNaN(parseFloat(nameParts[nameParts.length - 2]))) {
+                        x = parseFloat(nameParts[nameParts.length - 2]) || 0;
+                        z = parseFloat(nameParts[nameParts.length - 1]) || 0;
+                        name = nameParts.slice(0, -2).join(' ') || indivId;
+                    } else if (nameParts.length > 0) {
+                        name = nameParts.join(' ');
+                    }
+                    
+                    familySet.add(familyId);
+                    
+                    const person = {
+                        id: indivId,
+                        name: name,
+                        sex: sex === '1' ? 'M' : 'F',
+                        birthYear: null, // Will be set from TSV or calculated
+                        birthMonth: 6,
+                        deathYear: null,
+                        motherId: motherId === '0' ? null : motherId,
+                        fatherId: fatherId === '0' ? null : fatherId,
+                        familyId: familyId,
+                        x: x,
+                        z: z
+                    };
+                    
+                    newPersons.push(person);
+                });
+                
+                // Build family members map
+                familySet.forEach(fam => {
+                    familyMembers[fam] = newPersons.filter(p => p.familyId === fam).map(p => p.id);
+                });
+                
+                // Assign default birth years if not set (based on generation)
+                assignDefaultBirthYears(newPersons);
+                
+                // Auto-calculate positions if not provided
+                assignPositions(newPersons);
+                
+                // Build conceptions array
+                newPersons.forEach(person => {
+                    if (person.motherId && person.fatherId) {
+                        const mother = newPersons.find(p => p.id === person.motherId);
+                        if (mother && mother.birthYear) {
+                            conceptions.push({
+                                father: person.fatherId,
+                                mother: person.motherId,
+                                child: person.id
+                            });
+                        }
+                    }
+                });
+                
+                // Update global familyData
+                familyData = newPersons;
+                
+                // Store in families array
+                families = Array.from(familySet).map(fam => ({
+                    id: fam,
+                    name: fam,
+                    members: familyMembers[fam]
+                }));
+                
+                // If TSV file was also selected, process it before building the scene
+                if (tsvFile) {
+                    await processTsvFile(tsvFile);
+                }
+                
+                // Rebuild scene
+                createFamily();
+                updatePedigreeInfo();
+                
+                console.log(`Imported ${familyData.length} persons from ${pedFile.name}` + 
+                    (tsvFile ? ` with life events from ${tsvFile.name}` : ''));
+                
+                // Reset file input
+                event.target.value = '';
+                
+            } catch (error) {
+                console.error('Error importing .ped file:', error);
+                alert('Error importing .ped file: ' + error.message);
+            }
+        }
+        
+        // Assign default birth years based on parent-child relationships
+        function assignDefaultBirthYears(persons) {
+            // Find roots (no parents in data)
+            const personMap = new Map(persons.map(p => [p.id, p]));
+            const roots = persons.filter(p => 
+                (!p.motherId || !personMap.has(p.motherId)) &&
+                (!p.fatherId || !personMap.has(p.fatherId))
+            );
+            
+            // Assign birth years starting from a base year
+            const baseYear = 1940;
+            const generationGap = 25;
+            
+            const visited = new Set();
+            const queue = roots.map(r => ({ person: r, generation: 0 }));
+            
+            while (queue.length > 0) {
+                const { person, generation } = queue.shift();
+                if (visited.has(person.id)) continue;
+                visited.add(person.id);
+                
+                if (!person.birthYear) {
+                    person.birthYear = baseYear + (generation * generationGap);
+                }
+                
+                // Find children and add to queue
+                persons.filter(p => p.motherId === person.id || p.fatherId === person.id)
+                    .forEach(child => queue.push({ person: child, generation: generation + 1 }));
+            }
+            
+            // Handle any unvisited persons
+            persons.filter(p => !visited.has(p.id)).forEach(p => {
+                if (!p.birthYear) p.birthYear = 1980;
+            });
+        }
+        
+        // Auto-assign X/Z positions for visualization
+        function assignPositions(persons) {
+            // Group by family
+            const familyGroups = {};
+            persons.forEach(p => {
+                if (!familyGroups[p.familyId]) familyGroups[p.familyId] = [];
+                familyGroups[p.familyId].push(p);
+            });
+            
+            let familyOffset = 0;
+            
+            Object.keys(familyGroups).forEach(familyId => {
+                const familyPersons = familyGroups[familyId];
+                
+                // Sort by birth year
+                familyPersons.sort((a, b) => (a.birthYear || 2000) - (b.birthYear || 2000));
+                
+                // Calculate generations
+                const generations = new Map();
+                const personMap = new Map(familyPersons.map(p => [p.id, p]));
+                
+                familyPersons.forEach(person => {
+                    let gen = 0;
+                    let current = person;
+                    while (current.motherId && personMap.has(current.motherId)) {
+                        gen++;
+                        current = personMap.get(current.motherId);
+                    }
+                    generations.set(person.id, gen);
+                });
+                
+                // Group by generation
+                const genGroups = {};
+                familyPersons.forEach(person => {
+                    const gen = generations.get(person.id);
+                    if (!genGroups[gen]) genGroups[gen] = [];
+                    genGroups[gen].push(person);
+                });
+                
+                // Assign positions
+                const genKeys = Object.keys(genGroups).map(Number).sort((a, b) => a - b);
+                genKeys.forEach((gen, genIndex) => {
+                    const genPersons = genGroups[gen];
+                    genPersons.forEach((person, i) => {
+                        // Only assign if position is 0,0 (default/unset)
+                        if (person.x === 0 && person.z === 0) {
+                            person.x = familyOffset + (i - (genPersons.length - 1) / 2) * 2;
+                            person.z = -gen * 4;
+                        }
+                    });
+                });
+                
+                familyOffset += 8; // Space between families
+            });
+        }
+        
+        // Export pedigree to .ped file
+        function exportPedFile() {
+            if (familyData.length === 0) {
+                alert('No pedigree data to export.');
+                return;
+            }
+            
+            // Format: FamilyID IndivID FatherID MotherID Sex Name X Z
+            const lines = familyData.map(person => {
+                const familyId = person.familyId || 'FAM1';
+                const fatherId = person.fatherId || '0';
+                const motherId = person.motherId || '0';
+                const sex = person.sex === 'M' ? '1' : '2';
+                return `${familyId}\t${person.id}\t${fatherId}\t${motherId}\t${sex}\t${person.name}\t${person.x.toFixed(2)}\t${person.z.toFixed(2)}`;
+            });
+            
+            const header = '# FamilyID\tIndivID\tFatherID\tMotherID\tSex\tName\tX\tZ';
+            const content = header + '\n' + lines.join('\n');
+            
+            return content;
+        }
+        
+        // Generate TSV content for export
+        function generateTsvContent() {
+            const lines = ['IndivID\tName\tDOB\tDOD\tEventType\tEventName\tOnsetYear\tSeverity\tDescription'];
+            
+            // Export DOB/DOD for all persons
+            familyData.forEach(person => {
+                const personEvents = lifeEvents.filter(e => e.personId === person.id);
+                
+                if (personEvents.length === 0) {
+                    // Just DOB/DOD, no events
+                    const dob = person.birthMonth ? 
+                        `${person.birthYear}-${String(person.birthMonth).padStart(2, '0')}-01` : 
+                        (person.birthYear || '');
+                    const dod = person.deathYear || '';
+                    lines.push(`${person.id}\t${person.name}\t${dob}\t${dod}\t\t\t\t\t`);
+                } else {
+                    // Include each event as a row
+                    personEvents.forEach((event, idx) => {
+                        const dob = idx === 0 ? (person.birthMonth ? 
+                            `${person.birthYear}-${String(person.birthMonth).padStart(2, '0')}-01` : 
+                            (person.birthYear || '')) : '';
+                        const dod = idx === 0 ? (person.deathYear || '') : '';
+                        lines.push(`${person.id}\t${person.name}\t${dob}\t${dod}\t${event.eventType}\t${event.name}\t${event.onsetYear || ''}\t${event.severity}\t${event.description}`);
+                    });
+                }
+            });
+            
+            return lines.join('\n');
+        }
+        
+        // Export to .momi (zip containing pedigree.ped + life_events.tsv)
+        async function exportMomiFile() {
+            if (familyData.length === 0) {
+                alert('No pedigree data to export.');
+                return;
+            }
+            
+            try {
+                const zip = new JSZip();
+                
+                // Add pedigree.ped
+                const pedContent = generatePedContent();
+                zip.file('pedigree.ped', pedContent);
+                
+                // Add life_events.tsv
+                const tsvContent = generateTsvContent();
+                zip.file('life_events.tsv', tsvContent);
+                
+                // Generate zip and download
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'pedigree.momi';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                console.log('Exported pedigree.momi with pedigree.ped and life_events.tsv');
+            } catch (error) {
+                console.error('Error exporting .momi file:', error);
+                alert('Error exporting .momi file: ' + error.message);
+            }
+        }
+        
+        // Import from .momi (zip containing pedigree.ped + life_events.tsv)
+        async function handleMomiImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            try {
+                const zip = await JSZip.loadAsync(file);
+                
+                // Find .ped file in zip
+                const pedFileName = Object.keys(zip.files).find(name => name.toLowerCase().endsWith('.ped'));
+                const tsvFileName = Object.keys(zip.files).find(name => name.toLowerCase().endsWith('.tsv'));
+                
+                if (!pedFileName) {
+                    alert('No .ped file found in the archive');
+                    return;
+                }
+                
+                // Read PED file content
+                const pedText = await zip.files[pedFileName].async('string');
+                const lines = pedText.trim().split('\n');
+                
+                // Clear existing data
+                clearScene();
+                familyData = [];
+                conceptions = [];
+                families = [];
+                lifeEvents = [];
+                familyMembers = {};
+                
+                // Parse .ped file
+                const newPersons = [];
+                const familySet = new Set();
+                
+                lines.forEach((line) => {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine || trimmedLine.startsWith('#')) return;
+                    
+                    const parts = trimmedLine.split(/\t|\s+/);
+                    if (parts.length < 6) return;
+                    
+                    const [familyId, indivId, fatherId, motherId, sex, ...nameParts] = parts;
+                    
+                    let name = nameParts[0] || indivId;
+                    let x = 0, z = 0;
+                    
+                    if (nameParts.length >= 3 && !isNaN(parseFloat(nameParts[nameParts.length - 2]))) {
+                        x = parseFloat(nameParts[nameParts.length - 2]) || 0;
+                        z = parseFloat(nameParts[nameParts.length - 1]) || 0;
+                        name = nameParts.slice(0, -2).join(' ') || indivId;
+                    } else if (nameParts.length > 0) {
+                        name = nameParts.join(' ');
+                    }
+                    
+                    familySet.add(familyId);
+                    
+                    const person = {
+                        id: indivId,
+                        name: name,
+                        sex: sex === '1' ? 'M' : 'F',
+                        birthYear: null,
+                        birthMonth: 6,
+                        deathYear: null,
+                        motherId: motherId === '0' ? null : motherId,
+                        fatherId: fatherId === '0' ? null : fatherId,
+                        familyId: familyId,
+                        x: x,
+                        z: z
+                    };
+                    
+                    newPersons.push(person);
+                });
+                
+                // Build family members map
+                familySet.forEach(fam => {
+                    familyMembers[fam] = newPersons.filter(p => p.familyId === fam).map(p => p.id);
+                });
+                
+                // Assign default birth years
+                assignDefaultBirthYears(newPersons);
+                
+                // Auto-calculate positions if not provided
+                assignPositions(newPersons);
+                
+                // Build conceptions array
+                newPersons.forEach(person => {
+                    if (person.motherId && person.fatherId) {
+                        conceptions.push({
+                            father: person.fatherId,
+                            mother: person.motherId,
+                            child: person.id
+                        });
+                    }
+                });
+                
+                // Update global familyData
+                familyData = newPersons;
+                
+                families = Array.from(familySet).map(fam => ({
+                    id: fam,
+                    name: fam,
+                    members: familyMembers[fam]
+                }));
+                
+                // If TSV file exists, process it
+                if (tsvFileName) {
+                    const tsvText = await zip.files[tsvFileName].async('string');
+                    await processTsvContent(tsvText);
+                }
+                
+                // Rebuild scene
+                createFamily();
+                updatePedigreeInfo();
+                
+                console.log(`Imported ${familyData.length} persons from ${file.name}` + 
+                    (tsvFileName ? ` with life events` : ''));
+                
+                event.target.value = '';
+                
+            } catch (error) {
+                console.error('Error importing .momi file:', error);
+                alert('Error importing .momi file: ' + error.message);
+            }
+        }
+        
+        // Process TSV content string (for use by both file import and zip import)
+        async function processTsvContent(text) {
+            const lines = text.trim().split('\n');
+            
+            // Parse header to determine column indices
+            const header = lines[0].split('\t');
+            const colIndex = {};
+            header.forEach((col, i) => {
+                colIndex[col.toLowerCase().trim()] = i;
+            });
+            
+            const indivIdCol = colIndex['individid'] ?? colIndex['individ'] ?? colIndex['id'] ?? 0;
+            const personNameCol = colIndex['name'] ?? -1;
+            const dobCol = colIndex['dob'] ?? colIndex['birthyear'] ?? colIndex['birth'] ?? -1;
+            const dodCol = colIndex['dod'] ?? colIndex['deathyear'] ?? colIndex['death'] ?? -1;
+            const eventTypeCol = colIndex['eventtype'] ?? colIndex['type'] ?? -1;
+            const eventNameCol = colIndex['eventname'] ?? colIndex['event'] ?? -1;
+            const onsetYearCol = colIndex['onsetyear'] ?? colIndex['onset'] ?? colIndex['year'] ?? -1;
+            const severityCol = colIndex['severity'] ?? -1;
+            const descriptionCol = colIndex['description'] ?? colIndex['desc'] ?? -1;
+            
+            // Skip header, process data rows
+            for (let i = 1; i < lines.length; i++) {
+                const parts = lines[i].split('\t');
+                if (parts.length < 2) continue;
+                
+                const indivId = parts[indivIdCol]?.trim();
+                if (!indivId) continue;
+                
+                const person = familyData.find(p => p.id === indivId);
+                
+                if (person && personNameCol >= 0 && parts[personNameCol]) {
+                    const name = parts[personNameCol].trim();
+                    if (name) person.name = name;
+                }
+                
+                if (person) {
+                    if (dobCol >= 0 && parts[dobCol]) {
+                        const dob = parts[dobCol].trim();
+                        if (dob.includes('-') || dob.includes('/')) {
+                            const dateParts = dob.includes('-') ? dob.split('-') : dob.split('/');
+                            if (dateParts[0].length === 4) {
+                                person.birthYear = parseInt(dateParts[0]);
+                                person.birthMonth = parseInt(dateParts[1]) || 6;
+                            } else {
+                                person.birthYear = parseInt(dateParts[2]);
+                                person.birthMonth = parseInt(dateParts[0]) || 6;
+                            }
+                        } else {
+                            person.birthYear = parseInt(dob);
+                        }
+                    }
+                    
+                    if (dodCol >= 0 && parts[dodCol]) {
+                        const dod = parts[dodCol].trim();
+                        if (dod.includes('-') || dod.includes('/')) {
+                            const dateParts = dod.includes('-') ? dod.split('-') : dod.split('/');
+                            person.deathYear = parseInt(dateParts[0].length === 4 ? dateParts[0] : dateParts[2]);
+                        } else {
+                            person.deathYear = parseInt(dod);
+                        }
+                    }
+                }
+                
+                // Add life event if present
+                if (eventTypeCol >= 0 && parts[eventTypeCol]?.trim()) {
+                    const event = {
+                        personId: indivId,
+                        eventType: parts[eventTypeCol].trim(),
+                        name: eventNameCol >= 0 ? (parts[eventNameCol]?.trim() || '') : '',
+                        onsetYear: onsetYearCol >= 0 ? parseInt(parts[onsetYearCol]) || null : null,
+                        severity: severityCol >= 0 ? (parts[severityCol]?.trim() || 'mild') : 'mild',
+                        description: descriptionCol >= 0 ? (parts[descriptionCol]?.trim() || '') : ''
+                    };
+                    lifeEvents.push(event);
                 }
             }
         }
+        
+        // Generate PED content for export
+        function generatePedContent() {
+            if (familyData.length === 0) {
+                return '';
+            }
+            
+            const lines = familyData.map(person => {
+                const familyId = person.familyId || 'FAM1';
+                const fatherId = person.fatherId || '0';
+                const motherId = person.motherId || '0';
+                const sex = person.sex === 'M' ? '1' : '2';
+                return `${familyId}\t${person.id}\t${fatherId}\t${motherId}\t${sex}\t${person.name}\t${person.x.toFixed(2)}\t${person.z.toFixed(2)}`;
+            });
+            
+            const header = '# FamilyID\tIndivID\tFatherID\tMotherID\tSex\tName\tX\tZ';
+            return header + '\n' + lines.join('\n');
+        }
+        
+        // Keep legacy exportPedFile for compatibility but use new generator
+        function exportPedFile() {
+            if (familyData.length === 0) {
+                alert('No pedigree data to export.');
+                return;
+            }
+            const content = generatePedContent();
+            downloadFile(content, 'pedigree.ped', 'text/plain');
+        }
+        
+        // Handle .tsv file import (DOB, DOD, life events) - wrapper for file input
+        async function handleTsvImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            await processTsvFile(file);
+            
+            // If there were DOB/DOD changes, rebuild the scene
+            if (familyData.length > 0) {
+                clearScene();
+                createFamily();
+            }
+            
+            // Re-add life event markers if visible
+            if (lifeEventsVisible) {
+                toggleLifeEvents(); // Turn off
+                toggleLifeEvents(); // Turn on to refresh
+            }
+            
+            updatePedigreeInfo();
+            event.target.value = '';
+        }
+        
+        // Process TSV file contents - can be called from PED import or standalone
+        async function processTsvFile(file) {
+            try {
+                const text = await file.text();
+                const lines = text.trim().split('\n');
+                
+                // Clear existing life events for persons that will be updated
+                const newEvents = [];
+                const updatedPersons = new Set();
+                
+                // Parse header to determine column indices
+                const header = lines[0].split('\t');
+                const colIndex = {};
+                header.forEach((col, i) => {
+                    colIndex[col.toLowerCase().trim()] = i;
+                });
+                
+                // Expected columns: IndivID, Name, DOB, DOD, EventType, EventName, OnsetYear, Severity, Description
+                const indivIdCol = colIndex['individid'] ?? colIndex['individ'] ?? colIndex['id'] ?? 0;
+                const personNameCol = colIndex['name'] ?? -1;  // Person's name (optional)
+                const dobCol = colIndex['dob'] ?? colIndex['birthyear'] ?? colIndex['birth'] ?? -1;
+                const dodCol = colIndex['dod'] ?? colIndex['deathyear'] ?? colIndex['death'] ?? -1;
+                const eventTypeCol = colIndex['eventtype'] ?? colIndex['type'] ?? -1;
+                const eventNameCol = colIndex['eventname'] ?? colIndex['event'] ?? -1;
+                const onsetYearCol = colIndex['onsetyear'] ?? colIndex['onset'] ?? colIndex['year'] ?? -1;
+                const severityCol = colIndex['severity'] ?? -1;
+                const descriptionCol = colIndex['description'] ?? colIndex['desc'] ?? -1;
+                
+                // Skip header, process data rows
+                for (let i = 1; i < lines.length; i++) {
+                    const parts = lines[i].split('\t');
+                    if (parts.length < 2) continue;
+                    
+                    const indivId = parts[indivIdCol]?.trim();
+                    if (!indivId) continue;
+                    
+                    // Find person in familyData
+                    const person = familyData.find(p => p.id === indivId);
+                    
+                    // Update person's name if provided
+                    if (person && personNameCol >= 0 && parts[personNameCol]) {
+                        const name = parts[personNameCol].trim();
+                        if (name) {
+                            person.name = name;
+                        }
+                    }
+                    
+                    // Update DOB/DOD if provided
+                    if (person) {
+                        if (dobCol >= 0 && parts[dobCol]) {
+                            const dob = parts[dobCol].trim();
+                            if (dob.includes('-') || dob.includes('/')) {
+                                // Parse date format YYYY-MM-DD or MM/DD/YYYY
+                                const dateParts = dob.includes('-') ? dob.split('-') : dob.split('/');
+                                if (dateParts[0].length === 4) {
+                                    person.birthYear = parseInt(dateParts[0]);
+                                    person.birthMonth = parseInt(dateParts[1]) || 6;
+                                } else {
+                                    person.birthYear = parseInt(dateParts[2]);
+                                    person.birthMonth = parseInt(dateParts[0]) || 6;
+                                }
+                            } else {
+                                person.birthYear = parseInt(dob);
+                            }
+                        }
+                        
+                        if (dodCol >= 0 && parts[dodCol]) {
+                            const dod = parts[dodCol].trim();
+                            if (dod && dod !== '0' && dod !== '') {
+                                if (dod.includes('-') || dod.includes('/')) {
+                                    const dateParts = dod.includes('-') ? dod.split('-') : dod.split('/');
+                                    person.deathYear = dateParts[0].length === 4 ? parseInt(dateParts[0]) : parseInt(dateParts[2]);
+                                } else {
+                                    person.deathYear = parseInt(dod) || null;
+                                }
+                            }
+                        }
+                        
+                        updatedPersons.add(indivId);
+                    }
+                    
+                    // Add life event if provided
+                    if (eventTypeCol >= 0 && parts[eventTypeCol] && parts[eventTypeCol].trim()) {
+                        const eventData = {
+                            id: `evt_${i}`,
+                            personId: indivId,
+                            eventType: parts[eventTypeCol]?.trim() || 'event',
+                            name: parts[eventNameCol]?.trim() || 'Event',
+                            onsetYear: parseInt(parts[onsetYearCol]) || null,
+                            severity: parts[severityCol]?.trim() || 'unknown',
+                            description: parts[descriptionCol]?.trim() || ''
+                        };
+                        
+                        if (eventData.onsetYear) {
+                            newEvents.push(eventData);
+                        }
+                    }
+                }
+                
+                // Merge new events with existing
+                // Remove old events for updated persons
+                lifeEvents = lifeEvents.filter(e => !updatedPersons.has(e.personId));
+                lifeEvents = lifeEvents.concat(newEvents);
+                
+                console.log(`Processed TSV: ${newEvents.length} events, ${updatedPersons.size} persons updated from ${file.name}`);
+                
+            } catch (error) {
+                console.error('Error processing .tsv file:', error);
+                alert('Error processing .tsv file: ' + error.message);
+            }
+        }
+        
+        // Export life events and DOB/DOD to .tsv file
+        function exportTsvFile() {
+            if (familyData.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+            
+            const lines = ['IndivID\tDOB\tDOD\tEventType\tEventName\tOnsetYear\tSeverity\tDescription'];
+            
+            // Export DOB/DOD for all persons
+            familyData.forEach(person => {
+                const personEvents = lifeEvents.filter(e => e.personId === person.id);
+                
+                if (personEvents.length === 0) {
+                    // Just DOB/DOD, no events
+                    const dob = person.birthMonth ? 
+                        `${person.birthYear}-${String(person.birthMonth).padStart(2, '0')}-01` : 
+                        (person.birthYear || '');
+                    const dod = person.deathYear || '';
+                    lines.push(`${person.id}\t${dob}\t${dod}\t\t\t\t\t`);
+                } else {
+                    // Include each event as a row
+                    personEvents.forEach((event, idx) => {
+                        const dob = idx === 0 ? (person.birthMonth ? 
+                            `${person.birthYear}-${String(person.birthMonth).padStart(2, '0')}-01` : 
+                            (person.birthYear || '')) : '';
+                        const dod = idx === 0 ? (person.deathYear || '') : '';
+                        lines.push(`${person.id}\t${dob}\t${dod}\t${event.eventType}\t${event.name}\t${event.onsetYear || ''}\t${event.severity}\t${event.description}`);
+                    });
+                }
+            });
+            
+            const content = lines.join('\n');
+            downloadFile(content, 'life_events.tsv', 'text/tab-separated-values');
+        }
+        
+        // Helper function to download a file
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // ============ END IMPORT/EXPORT FUNCTIONS ============
 
         function onWindowResize() {
             const container = document.getElementById('canvas-container');
@@ -2351,6 +3856,991 @@
                 document.getElementById('loading').style.background = 'rgba(255, 0, 0, 0.7)';
             }
         }
+
+        // ============================================
+        // MOUNT IMPROBABLE ANIMATION
+        // ============================================
+        
+        let miScene, miCamera, miRenderer, miControls, miAnimationId;
+        let miAnimationTime = 0;
+        let miIsPlaying = true;
+        let miStacksMesh = null;
+        
+        // Mountain parameters - represents 3.8 billion years of life
+        const MI_MOUNTAIN_HEIGHT = 380; // Y units (scaled for visualization)
+        const MI_MOUNTAIN_BASE_RADIUS = 15; // Narrow at origin of life
+        const MI_MOUNTAIN_TOP_RADIUS = 40; // Wide at present
+        const MI_STACKS_PER_SLICE = 60;
+        const MI_SLICE_STEP = 2; // Y units between slices
+        
+        // Sector colors representing different domains of life
+        const MI_SECTORS = [
+            { name: 'Bacteria', color: 0x00ffff },
+            { name: 'Archaea', color: 0xff00ff },
+            { name: 'Mammals', color: 0xff6699 },
+            { name: 'Birds', color: 0xff9944 },
+            { name: 'Reptiles', color: 0x66ff66 },
+            { name: 'Amphibians', color: 0x44ffaa },
+            { name: 'Fish', color: 0x4488ff },
+            { name: 'Insects', color: 0xffaa44 },
+            { name: 'Plants', color: 0x44ff44 },
+            { name: 'Fungi', color: 0xaa88ff },
+            { name: 'Other Animals', color: 0xffff44 }
+        ];
+        
+        // Timeline markers with evolutionary milestones
+        const MI_TIMELINE = [
+            { y: 0, text: 'Present Day', timeMa: 0, color: '#00ff88' },
+            { y: -4, text: 'First Humans (300 ka)', timeMa: 0.3, color: '#ffaa44' },
+            { y: -13, text: 'K-T Extinction (66 Ma)', timeMa: 66, color: '#ff4444' },
+            { y: -40, text: 'First Mammals (200 Ma)', timeMa: 200, color: '#ff6699' },
+            { y: -105, text: 'First Fish (525 Ma)', timeMa: 525, color: '#4488ff' },
+            { y: -108, text: 'Cambrian Explosion (541 Ma)', timeMa: 541, color: '#ffff00' },
+            { y: -160, text: 'First Animals (800 Ma)', timeMa: 800, color: '#ff88ff' },
+            { y: -120, text: 'Sexual Reproduction (1.2 Ga)', timeMa: 1200, color: '#ff66cc' },
+            { y: -240, text: 'First Eukaryotes (2.1 Ga)', timeMa: 2100, color: '#ff00ff' },
+            { y: -300, text: 'Great Oxidation (2.4 Ga)', timeMa: 2400, color: '#00ffff' },
+            { y: -380, text: 'Origin of Life (3.8 Ga)', timeMa: 3800, color: '#ffffff' }
+        ];
+        
+        // Narration sequence
+        const MI_NARRATION = [
+            { time: 0, duration: 6000, text: "This is Mount Improbable — a visualization of 3.8 billion years of life on Earth." },
+            { time: 6000, duration: 5000, text: "Each vertical stack represents a living being. Males are square, females are round." },
+            { time: 11000, duration: 5000, text: "At the base is the origin of life — LUCA, the Last Universal Common Ancestor." },
+            { time: 16000, duration: 5000, text: "For billions of years, only bacteria and archaea existed, reproducing asexually." },
+            { time: 21000, duration: 6000, text: "Around 1.2 billion years ago, sexual reproduction evolved. Now males and females combine their genes." },
+            { time: 27000, duration: 5000, text: "Yellow lines show conception — where father and mother meet. Green lines show birth." },
+            { time: 32000, duration: 5000, text: "Species cluster together. As we climb the mountain, species come and go, evolve and diversify." },
+            { time: 37000, duration: 5000, text: "The mountain widens toward the present. More species alive today than ever before." },
+            { time: 42000, duration: 6000, text: "And at the very summit — humans. Your family. YOU. The peak of your own ancestral mountain." },
+            { time: 47000, duration: 5000, text: "In MOMI, you visualize your personal summit — the last few generations of YOUR climb." },
+        ];
+        
+        function showMIMenu() {
+            document.getElementById('mi-menu-modal').classList.add('visible');
+        }
+        
+        function closeMIMenu() {
+            document.getElementById('mi-menu-modal').classList.remove('visible');
+        }
+        
+        function showMIAnimation() {
+            closeMIMenu();
+            document.getElementById('mi-animation-modal').classList.add('visible');
+            initMIAnimation();
+        }
+        
+        function closeMIAnimation() {
+            document.getElementById('mi-animation-modal').classList.remove('visible');
+            if (miAnimationId) {
+                cancelAnimationFrame(miAnimationId);
+                miAnimationId = null;
+            }
+            // Clean up Three.js resources
+            if (miRenderer) {
+                miRenderer.dispose();
+                const container = document.getElementById('mi-animation-container');
+                if (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+            }
+            if (miStacksMesh) {
+                miStacksMesh.geometry.dispose();
+                miStacksMesh.material.dispose();
+                miStacksMesh = null;
+            }
+            miScene = null;
+            miCamera = null;
+            miRenderer = null;
+            miControls = null;
+        }
+        
+        function miAnimationToggle() {
+            miIsPlaying = !miIsPlaying;
+            document.getElementById('mi-play-btn').textContent = miIsPlaying ? '⏸ Pause' : '▶ Play';
+        }
+        
+        // Speed control variable
+        let miAnimationSpeed = 1.0;
+        
+        function setMISpeed(speed) {
+            miAnimationSpeed = parseFloat(speed);
+            updateSpeedDisplay(speed);
+        }
+        
+        function updateSpeedDisplay(speed) {
+            document.getElementById('mi-speed-value').textContent = parseFloat(speed).toFixed(1) + 'x';
+        }
+        
+        function jumpToEpoch(targetY) {
+            if (!miCamera || !miControls) return;
+            
+            // Pause animation during jump
+            miIsPlaying = false;
+            document.getElementById('mi-play-btn').textContent = '▶ Play';
+            
+            // Calculate the animation time that corresponds to this Y position
+            // The animation runs from y=50 to y=-MI_MOUNTAIN_HEIGHT over ~300 seconds
+            const totalYRange = 50 + MI_MOUNTAIN_HEIGHT; // 50 to -380 = 430 units
+            const targetProgress = (50 - targetY) / totalYRange;
+            miAnimationTime = targetProgress * 300; // Map to animation time
+            
+            // Position camera at this epoch with a nice viewing angle
+            const viewRadius = 80 + Math.abs(targetY) * 0.3; // Farther away at deeper times
+            const angle = (targetProgress * Math.PI * 6) + Math.PI / 4; // Spiral position
+            
+            miCamera.position.set(
+                Math.sin(angle) * viewRadius,
+                targetY + 30, // Above the target point
+                Math.cos(angle) * viewRadius
+            );
+            
+            miControls.target.set(0, targetY, 0);
+            miCamera.lookAt(0, targetY, 0);
+            miControls.update();
+            
+            // Update timeline display based on Y position
+            updateTimelineDisplay(targetY);
+        }
+        
+        function updateTimelineDisplay(y) {
+            const timelineDisplay = document.getElementById('mi-timeline-display');
+            if (y >= -5) {
+                timelineDisplay.textContent = 'Present Day';
+            } else if (y >= -20) {
+                timelineDisplay.textContent = 'Cenozoic Era (~66 Ma)';
+            } else if (y >= -50) {
+                timelineDisplay.textContent = 'Mesozoic Era (~250 Ma)';
+            } else if (y >= -108) {
+                timelineDisplay.textContent = 'Paleozoic Era (~541 Ma)';
+            } else if (y >= -200) {
+                timelineDisplay.textContent = 'Proterozoic Eon (~1 Ga)';
+            } else if (y >= -300) {
+                timelineDisplay.textContent = 'Archean Eon (~2.5 Ga)';
+            } else {
+                timelineDisplay.textContent = 'Hadean Eon (~4 Ga)';
+            }
+        }
+        
+        function miAnimationRestart() {
+            miAnimationTime = 0;
+            miIsPlaying = true;
+            miAnimationSpeed = 1.0;
+            document.getElementById('mi-play-btn').textContent = '⏸ Pause';
+            document.getElementById('mi-speed-slider').value = 1;
+            document.getElementById('mi-speed-value').textContent = '1.0x';
+            
+            // Reset camera position
+            if (miCamera) {
+                miCamera.position.set(0, 50, 120);
+                miCamera.lookAt(0, 0, 0);
+                if (miControls) {
+                    miControls.target.set(0, 0, 0);
+                }
+            }
+            
+            // Reset title visibility
+            document.getElementById('mi-animation-title').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('mi-animation-title').classList.add('visible');
+            }, 500);
+        }
+        
+        function initMIAnimation() {
+            const container = document.getElementById('mi-animation-container');
+            
+            // Scene
+            miScene = new THREE.Scene();
+            miScene.background = new THREE.Color(0x000510);
+            miScene.fog = new THREE.Fog(0x000510, 100, 500);
+            
+            // Camera - start at present day summit
+            miCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            miCamera.position.set(0, 50, 120);
+            miCamera.lookAt(0, 0, 0);
+            
+            // Renderer
+            miRenderer = new THREE.WebGLRenderer({ antialias: true });
+            miRenderer.setSize(container.clientWidth, container.clientHeight);
+            miRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            miRenderer.setClearColor(0x000510);
+            container.appendChild(miRenderer.domElement);
+            
+            // OrbitControls for manual exploration
+            miControls = new THREE.OrbitControls(miCamera, miRenderer.domElement);
+            miControls.enableDamping = true;
+            miControls.dampingFactor = 0.05;
+            miControls.minDistance = 20;
+            miControls.maxDistance = 400;
+            miControls.target.set(0, 0, 0);
+            
+            // Lights - enhanced for warm glow effect
+            miScene.add(new THREE.AmbientLight(0xffeedd, 0.3)); // Warm ambient
+            
+            const sunLight = new THREE.DirectionalLight(0xffffee, 1.2);
+            sunLight.position.set(50, 200, 100);
+            miScene.add(sunLight);
+            
+            // Warm point light at the summit (present day) - consciousness glow
+            const summitGlow = new THREE.PointLight(0xffaa44, 1.5, 150);
+            summitGlow.position.set(0, 30, 0);
+            miScene.add(summitGlow);
+            
+            // Cool point light at the base (origin) - primordial
+            const originGlow = new THREE.PointLight(0x4466ff, 0.8, 200);
+            originGlow.position.set(0, -MI_MOUNTAIN_HEIGHT - 20, 0);
+            miScene.add(originGlow);
+            
+            // Hemisphere light for natural feel - warm sky, cool ground
+            const hemiLight = new THREE.HemisphereLight(0xffddaa, 0x4466aa, 0.4);
+            miScene.add(hemiLight);
+            
+            // Generate the mountain of life
+            createMIMountain();
+            
+            // Add timeline markers
+            createMITimelineMarkers();
+            
+            // Add starfield background
+            addMIStarfield();
+            
+            // Show title
+            setTimeout(() => {
+                document.getElementById('mi-animation-title').classList.add('visible');
+            }, 500);
+            
+            // Hide title after a few seconds
+            setTimeout(() => {
+                document.getElementById('mi-animation-title').classList.remove('visible');
+            }, 5000);
+            
+            // Handle window resize
+            window.addEventListener('resize', onMIResize);
+            
+            // Start animation
+            miAnimationTime = 0;
+            miIsPlaying = true;
+            animateMI();
+        }
+        
+        function createMIMountain() {
+            // Store individuals for drawing connections
+            const allIndividuals = [];
+            
+            // Create geometry for males (square/box) and females (rounded/cylinder)
+            const maleGeometry = new THREE.BoxGeometry(0.3, 1, 0.3);
+            const femaleGeometry = new THREE.CylinderGeometry(0.18, 0.18, 1, 12);
+            
+            // Materials with warm glow
+            const maleMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                shininess: 60,
+                emissive: 0x442200,
+                emissiveIntensity: 0.4
+            });
+            const femaleMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                shininess: 60,
+                emissive: 0x442200,
+                emissiveIntensity: 0.4
+            });
+            
+            const totalSlices = Math.floor(MI_MOUNTAIN_HEIGHT / MI_SLICE_STEP);
+            const maxStacks = totalSlices * MI_STACKS_PER_SLICE;
+            
+            // Create separate instanced meshes for males and females
+            const malesMesh = new THREE.InstancedMesh(maleGeometry, maleMaterial, Math.floor(maxStacks / 2));
+            const femalesMesh = new THREE.InstancedMesh(femaleGeometry, femaleMaterial, Math.floor(maxStacks / 2));
+            
+            let maleIndex = 0;
+            let femaleIndex = 0;
+            const matrix = new THREE.Matrix4();
+            const tempMatrix = new THREE.Matrix4();
+            
+            // Sexual reproduction emerged around 1.2 billion years ago (t ~ 0.68)
+            const SEXUAL_REPRODUCTION_TIME = 0.68;
+            
+            // Track species - each species is a cluster of individuals
+            let speciesCounter = 0;
+            const speciesRegistry = new Map(); // speciesId -> { sector, startTime, endTime, individuals }
+            
+            for (let slice = 0; slice < totalSlices; slice++) {
+                const y = -slice * MI_SLICE_STEP;
+                const t = slice / totalSlices; // 0 = present, 1 = origin
+                
+                // Radius widens toward present
+                const radius = MI_MOUNTAIN_TOP_RADIUS - (MI_MOUNTAIN_TOP_RADIUS - MI_MOUNTAIN_BASE_RADIUS) * t;
+                
+                // Determine active sectors at this time depth
+                let activeSectors = [...MI_SECTORS];
+                if (t > 0.95) {
+                    activeSectors = MI_SECTORS.filter(s => ['Bacteria', 'Archaea'].includes(s.name));
+                } else if (t > 0.7) {
+                    activeSectors = MI_SECTORS.filter(s => ['Bacteria', 'Archaea', 'Fungi', 'Plants'].includes(s.name));
+                } else if (t > 0.4) {
+                    activeSectors = MI_SECTORS.filter(s => !['Mammals', 'Birds'].includes(s.name));
+                } else if (t > 0.15) {
+                    activeSectors = MI_SECTORS.filter(s => s.name !== 'Mammals');
+                }
+                
+                // Density increases toward present
+                const density = Math.pow(1 - t, 0.5);
+                const stacksThisSlice = Math.floor(MI_STACKS_PER_SLICE * Math.max(0.1, density));
+                
+                // Create/update species for this time slice
+                const speciesPerSector = Math.max(1, Math.floor(3 * (1 - t))); // More species toward present
+                
+                for (let i = 0; i < stacksThisSlice; i++) {
+                    const sector = activeSectors[i % activeSectors.length];
+                    const sectorIdx = MI_SECTORS.indexOf(sector);
+                    
+                    // Assign to a species within this sector
+                    const speciesInSector = (i % speciesPerSector);
+                    const speciesId = `${sector.name}_${Math.floor(t * 20)}_${speciesInSector}`;
+                    
+                    // Species clustering - individuals of same species are closer together
+                    const speciesAngleBase = (sectorIdx / MI_SECTORS.length) * Math.PI * 2;
+                    const speciesOffset = (speciesInSector / speciesPerSector) * 0.5;
+                    const individualOffset = (Math.random() - 0.5) * 0.3;
+                    const angle = speciesAngleBase + speciesOffset + individualOffset;
+                    
+                    const r = radius * (0.6 + Math.random() * 0.35);
+                    const x = Math.cos(angle) * r;
+                    const z = Math.sin(angle) * r;
+                    
+                    // Stack height (lifespan)
+                    const stackHeight = 1.5 + Math.random() * 2;
+                    
+                    // Determine sex - only after sexual reproduction evolved
+                    const hasSexualReproduction = t < SEXUAL_REPRODUCTION_TIME;
+                    const isMale = hasSexualReproduction ? (Math.random() < 0.5) : null;
+                    
+                    // Color calculation
+                    const warmth = 1 - t;
+                    const sectorColor = new THREE.Color(sector.color);
+                    const coldColor = new THREE.Color(0x1a0a30);
+                    const warmColor = new THREE.Color(0xffaa44);
+                    const baseWarmth = new THREE.Color().lerpColors(coldColor, warmColor, Math.pow(warmth, 0.7));
+                    
+                    const finalColor = new THREE.Color();
+                    finalColor.copy(sectorColor);
+                    finalColor.lerp(baseWarmth, 0.5);
+                    finalColor.lerp(new THREE.Color(0xffffee), warmth * 0.3);
+                    
+                    // Tint males slightly blue, females slightly pink (for sexual species)
+                    if (hasSexualReproduction) {
+                        if (isMale) {
+                            finalColor.lerp(new THREE.Color(0x6688ff), 0.2);
+                        } else {
+                            finalColor.lerp(new THREE.Color(0xff88aa), 0.2);
+                        }
+                    }
+                    
+                    // Build transformation matrix
+                    matrix.identity();
+                    tempMatrix.makeScale(1, stackHeight, 1);
+                    matrix.multiply(tempMatrix);
+                    matrix.setPosition(x, y + stackHeight / 2, z);
+                    
+                    // Store individual data
+                    const individual = {
+                        x, y, z,
+                        stackHeight,
+                        isMale,
+                        hasSexualReproduction,
+                        sector: sector.name,
+                        speciesId,
+                        timeDepth: t,
+                        topY: y + stackHeight,
+                        bottomY: y
+                    };
+                    allIndividuals.push(individual);
+                    
+                    // Add to appropriate mesh
+                    if (hasSexualReproduction && isMale) {
+                        if (maleIndex < Math.floor(maxStacks / 2)) {
+                            malesMesh.setMatrixAt(maleIndex, matrix);
+                            malesMesh.setColorAt(maleIndex, finalColor);
+                            individual.meshType = 'male';
+                            individual.meshIndex = maleIndex;
+                            maleIndex++;
+                        }
+                    } else {
+                        if (femaleIndex < Math.floor(maxStacks / 2)) {
+                            femalesMesh.setMatrixAt(femaleIndex, matrix);
+                            femalesMesh.setColorAt(femaleIndex, finalColor);
+                            individual.meshType = 'female';
+                            individual.meshIndex = femaleIndex;
+                            femaleIndex++;
+                        }
+                    }
+                }
+            }
+            
+            // Update meshes
+            malesMesh.count = maleIndex;
+            malesMesh.instanceMatrix.needsUpdate = true;
+            if (malesMesh.instanceColor) malesMesh.instanceColor.needsUpdate = true;
+            
+            femalesMesh.count = femaleIndex;
+            femalesMesh.instanceMatrix.needsUpdate = true;
+            if (femalesMesh.instanceColor) femalesMesh.instanceColor.needsUpdate = true;
+            
+            miScene.add(malesMesh);
+            miScene.add(femalesMesh);
+            
+            // Create conception and birth lines for a sample of species clusters
+            createReproductionLines(allIndividuals);
+            
+            // Create species boundary visualizations
+            createSpeciesClusters(allIndividuals);
+            
+            // Add ground plane at origin of life
+            const groundGeometry = new THREE.CircleGeometry(MI_MOUNTAIN_BASE_RADIUS * 1.5, 64);
+            const groundMaterial = new THREE.MeshPhongMaterial({
+                color: 0x111122,
+                transparent: true,
+                opacity: 0.5,
+                side: THREE.DoubleSide
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -MI_MOUNTAIN_HEIGHT - 2;
+            miScene.add(ground);
+            
+            // Add central time axis
+            const axisGeometry = new THREE.CylinderGeometry(0.3, 0.3, MI_MOUNTAIN_HEIGHT, 16);
+            const axisMaterial = new THREE.MeshPhongMaterial({
+                color: 0x444466,
+                transparent: true,
+                opacity: 0.3
+            });
+            const axis = new THREE.Mesh(axisGeometry, axisMaterial);
+            axis.position.y = -MI_MOUNTAIN_HEIGHT / 2;
+            miScene.add(axis);
+        }
+        
+        function createReproductionLines(individuals) {
+            // Create conception lines (yellow) between parents and birth lines (green) to children
+            // Only for sexual species (after ~1.2 Ga)
+            
+            const conceptionLineMaterial = new THREE.LineBasicMaterial({ 
+                color: 0xffcc00, 
+                transparent: true, 
+                opacity: 0.6 
+            });
+            const birthLineMaterial = new THREE.LineBasicMaterial({ 
+                color: 0x44ff88, 
+                transparent: true, 
+                opacity: 0.5 
+            });
+            
+            // Group individuals by species
+            const speciesGroups = new Map();
+            individuals.forEach(ind => {
+                if (!ind.hasSexualReproduction) return;
+                if (!speciesGroups.has(ind.speciesId)) {
+                    speciesGroups.set(ind.speciesId, { males: [], females: [] });
+                }
+                if (ind.isMale) {
+                    speciesGroups.get(ind.speciesId).males.push(ind);
+                } else {
+                    speciesGroups.get(ind.speciesId).females.push(ind);
+                }
+            });
+            
+            // For each species, create some family connections
+            let lineCount = 0;
+            const maxLines = 500; // Limit for performance
+            
+            speciesGroups.forEach((group, speciesId) => {
+                if (lineCount >= maxLines) return;
+                if (group.males.length === 0 || group.females.length === 0) return;
+                
+                // Sample some breeding pairs
+                const numPairs = Math.min(3, group.males.length, group.females.length);
+                
+                for (let p = 0; p < numPairs && lineCount < maxLines; p++) {
+                    const father = group.males[p % group.males.length];
+                    const mother = group.females[p % group.females.length];
+                    
+                    // Conception line - connects father to mother at conception point
+                    const conceptionY = Math.min(father.topY, mother.topY) - 0.5;
+                    const conceptionX = (father.x + mother.x) / 2;
+                    const conceptionZ = (father.z + mother.z) / 2;
+                    
+                    // Line from father to conception point
+                    const fatherToConception = new THREE.BufferGeometry().setFromPoints([
+                        new THREE.Vector3(father.x, conceptionY, father.z),
+                        new THREE.Vector3(conceptionX, conceptionY, conceptionZ)
+                    ]);
+                    const fatherLine = new THREE.Line(fatherToConception, conceptionLineMaterial);
+                    miScene.add(fatherLine);
+                    
+                    // Line from mother to conception point
+                    const motherToConception = new THREE.BufferGeometry().setFromPoints([
+                        new THREE.Vector3(mother.x, conceptionY, mother.z),
+                        new THREE.Vector3(conceptionX, conceptionY, conceptionZ)
+                    ]);
+                    const motherLine = new THREE.Line(motherToConception, conceptionLineMaterial);
+                    miScene.add(motherLine);
+                    
+                    // Conception sphere (yellow)
+                    const conceptionSphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.15, 8, 8),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xffcc00, 
+                            emissive: 0xffcc00, 
+                            emissiveIntensity: 0.5 
+                        })
+                    );
+                    conceptionSphere.position.set(conceptionX, conceptionY, conceptionZ);
+                    miScene.add(conceptionSphere);
+                    
+                    // Find potential children (individuals nearby and slightly "younger" in time)
+                    const childCandidates = individuals.filter(ind => 
+                        ind.speciesId === speciesId &&
+                        ind.bottomY > conceptionY - 5 && 
+                        ind.bottomY < conceptionY + 2 &&
+                        Math.abs(ind.x - conceptionX) < 5 &&
+                        Math.abs(ind.z - conceptionZ) < 5 &&
+                        ind !== father && ind !== mother
+                    );
+                    
+                    // Birth lines - from conception to children
+                    const numChildren = Math.min(2, childCandidates.length);
+                    for (let c = 0; c < numChildren; c++) {
+                        const child = childCandidates[c];
+                        
+                        // Gestation line (inside mother)
+                        const gestationEnd = child.bottomY;
+                        const gestationLine = new THREE.BufferGeometry().setFromPoints([
+                            new THREE.Vector3(conceptionX, conceptionY, conceptionZ),
+                            new THREE.Vector3(mother.x, gestationEnd + 0.5, mother.z)
+                        ]);
+                        const gestLine = new THREE.Line(gestationLine, new THREE.LineBasicMaterial({ 
+                            color: 0xff88aa, 
+                            transparent: true, 
+                            opacity: 0.4 
+                        }));
+                        miScene.add(gestLine);
+                        
+                        // Birth line (green) - from mother to child's base
+                        const birthLine = new THREE.BufferGeometry().setFromPoints([
+                            new THREE.Vector3(mother.x, gestationEnd + 0.5, mother.z),
+                            new THREE.Vector3(child.x, child.bottomY, child.z)
+                        ]);
+                        const bLine = new THREE.Line(birthLine, birthLineMaterial);
+                        miScene.add(bLine);
+                        
+                        // Birth sphere (green)
+                        const birthSphere = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.12, 8, 8),
+                            new THREE.MeshPhongMaterial({ 
+                                color: 0x44ff88, 
+                                emissive: 0x44ff88, 
+                                emissiveIntensity: 0.5 
+                            })
+                        );
+                        birthSphere.position.set(child.x, child.bottomY, child.z);
+                        miScene.add(birthSphere);
+                        
+                        lineCount++;
+                    }
+                    
+                    lineCount++;
+                }
+            });
+            
+            console.log(`Created ${lineCount} reproduction connection sets`);
+        }
+        
+        function createSpeciesClusters(individuals) {
+            // Create subtle boundaries/halos around species clusters
+            // Group by species
+            const speciesGroups = new Map();
+            individuals.forEach(ind => {
+                if (!speciesGroups.has(ind.speciesId)) {
+                    speciesGroups.set(ind.speciesId, []);
+                }
+                speciesGroups.get(ind.speciesId).push(ind);
+            });
+            
+            // For larger species groups, create a subtle boundary ring
+            speciesGroups.forEach((members, speciesId) => {
+                if (members.length < 5) return; // Skip small groups
+                
+                // Calculate bounding circle for species
+                let sumX = 0, sumZ = 0, avgY = 0;
+                members.forEach(m => {
+                    sumX += m.x;
+                    sumZ += m.z;
+                    avgY += m.y;
+                });
+                const centerX = sumX / members.length;
+                const centerZ = sumZ / members.length;
+                avgY = avgY / members.length;
+                
+                // Calculate radius
+                let maxDist = 0;
+                members.forEach(m => {
+                    const dist = Math.sqrt((m.x - centerX) ** 2 + (m.z - centerZ) ** 2);
+                    maxDist = Math.max(maxDist, dist);
+                });
+                
+                // Only create rings for reasonably sized species clusters
+                if (maxDist < 1 || maxDist > 15) return;
+                
+                // Get sector color for this species
+                const sector = MI_SECTORS.find(s => speciesId.startsWith(s.name));
+                const color = sector ? sector.color : 0x888888;
+                
+                // Create a subtle ring around the species
+                const ringGeometry = new THREE.RingGeometry(maxDist * 0.9, maxDist * 1.1, 32);
+                const ringMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.1,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.position.set(centerX, avgY, centerZ);
+                ring.rotation.x = -Math.PI / 2;
+                miScene.add(ring);
+            });
+        }
+
+        function createMITimelineMarkers() {
+            // Create geological time scale on the side
+            createGeologicalTimeScale();
+            
+            // Create 3D text sprites for timeline markers
+            MI_TIMELINE.forEach(marker => {
+                // Create ring at this time level
+                const ringGeometry = new THREE.RingGeometry(
+                    MI_MOUNTAIN_TOP_RADIUS - (MI_MOUNTAIN_TOP_RADIUS - MI_MOUNTAIN_BASE_RADIUS) * (-marker.y / MI_MOUNTAIN_HEIGHT) - 2,
+                    MI_MOUNTAIN_TOP_RADIUS - (MI_MOUNTAIN_TOP_RADIUS - MI_MOUNTAIN_BASE_RADIUS) * (-marker.y / MI_MOUNTAIN_HEIGHT) + 2,
+                    64
+                );
+                const ringMaterial = new THREE.MeshBasicMaterial({
+                    color: parseInt(marker.color.replace('#', '0x')),
+                    transparent: true,
+                    opacity: 0.3,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = -Math.PI / 2;
+                ring.position.y = marker.y;
+                miScene.add(ring);
+                
+                // Create label sprite
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = 512;
+                canvas.height = 64;
+                
+                context.fillStyle = marker.color;
+                context.font = 'Bold 28px Arial';
+                context.textAlign = 'left';
+                context.fillText(marker.text, 10, 45);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ 
+                    map: texture,
+                    transparent: true
+                });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                
+                // Position label outside the mountain
+                const labelRadius = MI_MOUNTAIN_TOP_RADIUS - (MI_MOUNTAIN_TOP_RADIUS - MI_MOUNTAIN_BASE_RADIUS) * (-marker.y / MI_MOUNTAIN_HEIGHT) + 15;
+                sprite.position.set(labelRadius, marker.y, 0);
+                sprite.scale.set(25, 3, 1);
+                miScene.add(sprite);
+            });
+        }
+        
+        function createGeologicalTimeScale() {
+            // Geological Eons, Eras, and Periods with their time ranges and colors
+            const geologicalScale = [
+                // Phanerozoic Eon (541 Ma - Present)
+                { name: 'Cenozoic', startMa: 66, endMa: 0, color: 0xffff00, type: 'era' },
+                { name: 'Mesozoic', startMa: 252, endMa: 66, color: 0x88ff88, type: 'era' },
+                { name: 'Paleozoic', startMa: 541, endMa: 252, color: 0x88aaff, type: 'era' },
+                
+                // Proterozoic Eon
+                { name: 'Neoproterozoic', startMa: 1000, endMa: 541, color: 0xff88aa, type: 'era' },
+                { name: 'Mesoproterozoic', startMa: 1600, endMa: 1000, color: 0xcc6688, type: 'era' },
+                { name: 'Paleoproterozoic', startMa: 2500, endMa: 1600, color: 0xaa4466, type: 'era' },
+                
+                // Archean Eon
+                { name: 'Archean', startMa: 4000, endMa: 2500, color: 0x8844aa, type: 'eon' },
+                
+                // Hadean Eon (before life)
+                { name: 'Hadean', startMa: 4600, endMa: 4000, color: 0x442266, type: 'eon' },
+            ];
+            
+            // Position the time scale on the side
+            const scaleX = -70; // Position to the left of the mountain
+            const scaleZ = 0;
+            const scaleWidth = 8;
+            
+            // Create vertical bar for each geological period
+            geologicalScale.forEach(period => {
+                // Convert Ma to Y position (3800 Ma = -380 Y, 0 Ma = 0 Y)
+                const startY = -(period.startMa / 10);
+                const endY = -(period.endMa / 10);
+                
+                // Clamp to mountain height
+                const clampedStartY = Math.max(startY, -MI_MOUNTAIN_HEIGHT);
+                const clampedEndY = Math.min(endY, 0);
+                
+                if (clampedStartY >= clampedEndY) return; // Skip if outside range
+                
+                const height = clampedEndY - clampedStartY;
+                const centerY = (clampedStartY + clampedEndY) / 2;
+                
+                // Create the period bar
+                const barGeometry = new THREE.BoxGeometry(scaleWidth, height, 3);
+                const barMaterial = new THREE.MeshPhongMaterial({
+                    color: period.color,
+                    transparent: true,
+                    opacity: 0.7,
+                    emissive: period.color,
+                    emissiveIntensity: 0.2
+                });
+                const bar = new THREE.Mesh(barGeometry, barMaterial);
+                bar.position.set(scaleX, centerY, scaleZ);
+                miScene.add(bar);
+                
+                // Add label for the period
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = 256;
+                canvas.height = 64;
+                
+                context.fillStyle = '#ffffff';
+                context.font = 'Bold 20px Arial';
+                context.textAlign = 'center';
+                context.fillText(period.name, 128, 40);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ 
+                    map: texture,
+                    transparent: true
+                });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.position.set(scaleX - 15, centerY, scaleZ);
+                sprite.scale.set(15, 4, 1);
+                miScene.add(sprite);
+            });
+            
+            // Add main time scale axis with tick marks
+            const axisX = scaleX + scaleWidth / 2 + 2;
+            
+            // Main vertical axis line
+            const axisPoints = [
+                new THREE.Vector3(axisX, 5, scaleZ),
+                new THREE.Vector3(axisX, -MI_MOUNTAIN_HEIGHT - 5, scaleZ)
+            ];
+            const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisPoints);
+            const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+            const axis = new THREE.Line(axisGeometry, axisMaterial);
+            miScene.add(axis);
+            
+            // Add tick marks and time labels every 500 Ma
+            for (let timeMa = 0; timeMa <= 4000; timeMa += 500) {
+                const y = -(timeMa / 10);
+                if (y < -MI_MOUNTAIN_HEIGHT) continue;
+                
+                // Tick mark
+                const tickPoints = [
+                    new THREE.Vector3(axisX, y, scaleZ),
+                    new THREE.Vector3(axisX + 3, y, scaleZ)
+                ];
+                const tickGeometry = new THREE.BufferGeometry().setFromPoints(tickPoints);
+                const tickMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+                const tick = new THREE.Line(tickGeometry, tickMaterial);
+                miScene.add(tick);
+                
+                // Time label
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = 128;
+                canvas.height = 48;
+                
+                context.fillStyle = '#ffffff';
+                context.font = 'Bold 24px Arial';
+                context.textAlign = 'left';
+                const label = timeMa === 0 ? 'Now' : (timeMa >= 1000 ? `${timeMa/1000} Ga` : `${timeMa} Ma`);
+                context.fillText(label, 5, 32);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ 
+                    map: texture,
+                    transparent: true
+                });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.position.set(axisX + 12, y, scaleZ);
+                sprite.scale.set(10, 3, 1);
+                miScene.add(sprite);
+            }
+            
+            // Add "GEOLOGICAL TIME SCALE" title at the top
+            const titleCanvas = document.createElement('canvas');
+            const titleContext = titleCanvas.getContext('2d');
+            titleCanvas.width = 512;
+            titleCanvas.height = 64;
+            
+            titleContext.fillStyle = '#00ffaa';
+            titleContext.font = 'Bold 28px Arial';
+            titleContext.textAlign = 'center';
+            titleContext.fillText('GEOLOGICAL TIME SCALE', 256, 45);
+            
+            const titleTexture = new THREE.CanvasTexture(titleCanvas);
+            const titleMaterial = new THREE.SpriteMaterial({ 
+                map: titleTexture,
+                transparent: true
+            });
+            const titleSprite = new THREE.Sprite(titleMaterial);
+            titleSprite.position.set(scaleX, 15, scaleZ);
+            titleSprite.scale.set(30, 4, 1);
+            miScene.add(titleSprite);
+        }
+        
+        function addMIStarfield() {
+            const starGeometry = new THREE.BufferGeometry();
+            const starCount = 3000;
+            const positions = new Float32Array(starCount * 3);
+            
+            for (let i = 0; i < starCount * 3; i += 3) {
+                // Distribute stars in a sphere around the scene
+                const radius = 300 + Math.random() * 200;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
+                positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = radius * Math.cos(phi);
+                positions[i + 2] = radius * Math.sin(phi) * Math.sin(theta);
+            }
+            
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const starMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.5,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            miScene.add(stars);
+        }
+        
+        function updateMINarration() {
+            const narrationEl = document.getElementById('mi-narration');
+            let currentNarration = null;
+            
+            for (const narration of MI_NARRATION) {
+                if (miAnimationTime >= narration.time && miAnimationTime < narration.time + narration.duration) {
+                    currentNarration = narration;
+                    break;
+                }
+            }
+            
+            if (currentNarration) {
+                if (narrationEl.textContent !== currentNarration.text) {
+                    narrationEl.classList.remove('visible');
+                    setTimeout(() => {
+                        narrationEl.textContent = currentNarration.text;
+                        narrationEl.classList.add('visible');
+                    }, 300);
+                }
+            } else {
+                narrationEl.classList.remove('visible');
+            }
+        }
+        
+        function updateMITimeline() {
+            // Calculate current time depth based on camera position
+            const progress = Math.min(1, miAnimationTime / 52000);
+            
+            // Animate from present to origin
+            const currentY = -MI_MOUNTAIN_HEIGHT * progress;
+            const currentTimeMa = 3800 * progress;
+            
+            const timelineEl = document.getElementById('mi-timeline-display');
+            if (currentTimeMa > 1000) {
+                timelineEl.textContent = `${(currentTimeMa / 1000).toFixed(1)} Billion Years Ago`;
+            } else if (currentTimeMa > 1) {
+                timelineEl.textContent = `${currentTimeMa.toFixed(0)} Million Years Ago`;
+            } else if (currentTimeMa > 0.001) {
+                timelineEl.textContent = `${(currentTimeMa * 1000).toFixed(0)} Thousand Years Ago`;
+            } else {
+                timelineEl.textContent = 'Present Day';
+            }
+        }
+        
+        function onMIResize() {
+            if (!miCamera || !miRenderer) return;
+            const container = document.getElementById('mi-animation-container');
+            miCamera.aspect = container.clientWidth / container.clientHeight;
+            miCamera.updateProjectionMatrix();
+            miRenderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        function animateMI() {
+            miAnimationId = requestAnimationFrame(animateMI);
+            
+            if (miIsPlaying) {
+                miAnimationTime += 16.67 * miAnimationSpeed; // Apply speed multiplier
+            }
+            
+            // Camera animation - descend through time
+            const progress = Math.min(1, miAnimationTime / 52000);
+            
+            // Spiral descent down the mountain
+            const angle = progress * Math.PI * 4; // 2 full rotations
+            const radius = 100 + progress * 50; // Gradually move out
+            const targetY = -MI_MOUNTAIN_HEIGHT * progress + 20;
+            
+            // Smoothly interpolate camera position
+            const targetX = Math.sin(angle) * radius;
+            const targetZ = Math.cos(angle) * radius;
+            
+            miCamera.position.x += (targetX - miCamera.position.x) * 0.02;
+            miCamera.position.y += (targetY - miCamera.position.y) * 0.02;
+            miCamera.position.z += (targetZ - miCamera.position.z) * 0.02;
+            
+            // Look at the mountain at current depth
+            const lookAtY = -MI_MOUNTAIN_HEIGHT * progress;
+            miControls.target.set(0, lookAtY, 0);
+            
+            // Update UI
+            updateMINarration();
+            updateMITimeline();
+            
+            // Loop animation after completion
+            if (miAnimationTime > 55000) {
+                miAnimationTime = 0;
+            }
+            
+            miControls.update();
+            miRenderer.render(miScene, miCamera);
+        }
+        
+        // Add click handler for title
+        document.getElementById('mi-title-link').addEventListener('click', showMIMenu);
+        
+        // Close modals on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMIAnimation();
+                closeMIMenu();
+            }
+        });
 
         // Start the visualization
         startVisualization();
