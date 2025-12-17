@@ -1,0 +1,13 @@
+# FamilyID	IndivID	FatherID	MotherID	Sex	Name
+# Paternal grandparents
+DEMO	PGF	0	0	1	Grandpa Erik
+DEMO	PGM	0	0	2	Grandma Anna
+# Maternal grandparents
+DEMO	MGF	0	0	1	Grandpa Lars
+DEMO	MGM	0	0	2	Grandma Karin
+# Parents
+DEMO	FATHER	PGF	PGM	1	Father Johan
+DEMO	MOTHER	MGF	MGM	2	Mother Maria
+# Children
+DEMO	SON	FATHER	MOTHER	1	Son Anders
+DEMO	DAUGHTER	FATHER	MOTHER	2	Daughter Elsa

@@ -1,0 +1,9 @@
+IndivID	Name	DOB	DOD	EventType	EventName	OnsetYear	Severity	Description
+PGF	Grandpa Erik	1935-03-15	2015-11-20	disease	Heart Disease	2005	severe	Coronary artery disease
+PGM	Grandma Anna	1938-07-22		disease	Arthritis	2000	moderate	Rheumatoid arthritis
+MGF	Grandpa Lars	1940-01-10	2020-06-15	disease	Diabetes	1995	moderate	Type 2 diabetes
+MGM	Grandma Karin	1942-09-05		disease	Osteoporosis	2010	mild	Bone density loss
+FATHER	Father Johan	1965-05-10		milestone	Marriage	1990	positive	Married Maria
+MOTHER	Mother Maria	1968-09-20		milestone	Marriage	1990	positive	Married Johan
+SON	Son Anders	1995-03-15		disease	Asthma	2003	mild	Childhood asthma
+DAUGHTER	Daughter Elsa	1998-11-08		milestone	Graduation	2020	positive	University graduation
