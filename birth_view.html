@@ -234,10 +234,12 @@
                 transparent: true,
                 opacity: 0.25,
                 wireframe: false,
-                side: THREE.DoubleSide
+                side: THREE.DoubleSide,
+                depthWrite: false
             });
             const motherMesh = new THREE.Mesh(motherGeometry, motherMaterial);
             motherMesh.position.set(0, conceptionHeight + motherStackHeight / 2, 0);
+            motherMesh.renderOrder = 0;
             scene.add(motherMesh);
 
             // Mother's edges for clarity
@@ -307,6 +309,7 @@
                     conceptionHeight + i * segmentHeight + segmentHeight / 2,
                     0
                 );
+                segment.renderOrder = 1;
                 scene.add(segment);
             }
 
